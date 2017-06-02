@@ -5,8 +5,8 @@ import backend.FloatPointUnit.OP;
 public class ReserStation {
 	private String name;	// sth like MULT1, ADD1
 	private boolean busy = false;
-	private ReserStation qj, qk;
-	private RegStates qi;
+	public ReserStation qj, qk;
+	public RegStates qi;
 	private float vj, vk;
 	private int a;
 	private OP op;
@@ -35,14 +35,14 @@ public class ReserStation {
 			a = inst.immidate;
 			break;
 		default:	// registers only
-			doOperand(inst.operan1, inst.operan2);
+			doOperand(inst.operand1, inst.operand2);
 			break;
 		}
 	}
 
 	public ReserStation(String name) {
+		this.qi = RegStates.getInstance();
 		this.name = name;
-		
 	}
 	
 	public String getName() {

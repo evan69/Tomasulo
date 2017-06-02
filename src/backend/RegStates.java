@@ -4,14 +4,16 @@ public class RegStates {
 	private static RegStates instance;
 	ReserStation[] sourceStations;
 	float regValues[];
+	static final int REG_NUM = 11;
+	
 	private RegStates(int num) {
 		sourceStations = new ReserStation[num];
 		regValues = new float[num];
 	}
 	
-	public static RegStates getInstance(int num) {
+	public static RegStates getInstance() {
 		if(instance == null) {
-			instance = new RegStates(num);
+			instance = new RegStates(REG_NUM);
 		}
 		return instance;
 	}
