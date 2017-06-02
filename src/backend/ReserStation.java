@@ -29,6 +29,7 @@ public class ReserStation {
 	}
 	
 	public void issueIn(Instruction inst) {
+		// handle source registers
 		switch (inst.op) {
 		case LD:
 		case ST:	// memory related
@@ -38,6 +39,8 @@ public class ReserStation {
 			doOperand(inst.operand1, inst.operand2);
 			break;
 		}
+		// handle target register
+		qi.setSourceStation(inst.target, this);
 	}
 
 	public ReserStation(String name) {

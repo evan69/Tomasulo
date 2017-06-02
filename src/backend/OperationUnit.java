@@ -48,4 +48,14 @@ public class OperationUnit {
 		}
 		return null;
 	}
+	
+	public void issueInstruction(Instruction curr) {
+		for(ReserStation station: stations) {
+			if(!station.isBusy()) {
+				station.issueIn(curr);
+				break;
+			}
+		}
+	}
+	
 }

@@ -29,4 +29,9 @@ public class RegStates {
 	public ReserStation getSourceStation(int ind) {
 		return sourceStations[ind];
 	}
+	
+	public void setSourceStation(int ind, ReserStation src) {
+		sourceStations[ind] = src;
+	}
+	
 }
