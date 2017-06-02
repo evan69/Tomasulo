@@ -34,4 +34,8 @@ public class RegStates {
 		sourceStations[ind] = src;
 	}
 	
+	public void setReg(int ind, float result) {
+		regValues[ind] = result;
+	}
+	
 }

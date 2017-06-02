@@ -7,7 +7,7 @@ public class ReserStation {
 	private boolean busy = false;
 	public ReserStation qj, qk;
 	public RegStates qi;
-	private float vj, vk;
+	float vj, vk;
 	private int a;
 	private OP op;
 	int cnt = 0;			// cnt is together with op
