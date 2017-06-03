@@ -149,7 +149,8 @@ public class OperationUnit {
 		*/
 	}
 	
-	public void writeBack() {
+	//选择一条指令准备执行
+	private void chooseNewExec() {
 		if(currentExec == null) {
 			//选取一个新的指令开始执行
 			ReserStation st = chooseStation();
@@ -158,6 +159,13 @@ public class OperationUnit {
 			currentExec = st;
 			currentTime = getExecTime(st.op);
 			result = getResult(st);
+		}
+	}
+	
+	public void writeBack() {
+		if(currentExec == null) {
+			chooseNewExec();
+			return;
 		}
 		if(currentTime > 0)
 			return;
@@ -171,6 +179,8 @@ public class OperationUnit {
 			if(currentExec.op == OP.LD) {
 				lo++;
 			}
+			
+			chooseNewExec();
 		}
 		else {
 			//是store指令，应在写回阶段写mem
@@ -179,6 +189,8 @@ public class OperationUnit {
 				currentExec.busy = false;
 				currentExec = null;
 				lo++;
+				
+				chooseNewExec();
 			}
 		}
 		
