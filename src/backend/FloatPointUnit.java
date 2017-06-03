@@ -20,33 +20,48 @@ public class FloatPointUnit {
 	Queue<Instruction> instQueue = new LinkedList<Instruction>();
 	public void update() {
 		// TODO
+		//疑问：一周期能进入多条指令还是一条
 		issueInstruction();
 		execute();
 		writeBack();
 	}
 	
 	public void issueInstruction() {
-		Instruction currentI = instQueue.poll();
+		//Instruction currentI = instQueue.poll();
+		Instruction currentI = instQueue.peek();
+		if(currentI == null)
+			return;
+		//指令序列里面没有指令，直接结束
+		
+		boolean issueInResult = false;
+		//对应的部件是否有空的保留站，或者说是否成功加到保留站里
+		
 		switch (currentI.op) {
 		case ADDD:
 		case SUBD:
-			addUnit.issueInstruction(currentI);
+			issueInResult = addUnit.issueInstruction(currentI);
 			break;
 		case MULD:
 		case DIVD:
-			multUnit.issueInstruction(currentI);
+			issueInResult = multUnit.issueInstruction(currentI);
 			break;
 		case LD:
-			ldUnit.issueInstruction(currentI);
+			issueInResult = ldUnit.issueInstruction(currentI);
 			break;
 		case ST:
-			stUnit.issueInstruction(currentI);
+			issueInResult = stUnit.issueInstruction(currentI);
 			break;
 		default:
 			System.out.println(currentI.op);
 			break;
 		}
-		// TODO : 可能的问题：如果保留站满了怎么办，如果队列为空怎么办？
+		
+		//如果保留站有空位，成功加入，则要从指令队列中去除一条指令
+		if(issueInResult == true) {
+			instQueue.poll();
+		}
+		
+		// fixed : 可能的问题：如果保留站满了怎么办，如果队列为空怎么办？
 	}
 	
 	private void execute() {

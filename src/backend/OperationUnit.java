@@ -100,6 +100,8 @@ public class OperationUnit {
 	
 	//执行
 	public void execute() {
+		//System.out.println(currentTime);
+		assert currentTime >= 0 : "error";
 		if(currentExec != null)
 			//exec current instr
 		{
@@ -121,6 +123,15 @@ public class OperationUnit {
 	}
 	
 	public void writeBack() {
+		if(currentExec == null) {
+			//选取一个新的指令开始执行
+			ReserStation st = chooseStation();
+			if(st == null)
+				return;
+			currentExec = st;
+			currentTime = getExecTime(st.op);
+			result = getResult(st);
+		}
 		if(currentTime > 0)
 			return;
 		if(currentExec.op != OP.ST) {
@@ -137,22 +148,18 @@ public class OperationUnit {
 			}
 		}
 		
-		//选取一个新的指令开始执行
-		ReserStation st = chooseStation();
-		if(st == null)
-			return;
-		currentExec = st;
-		currentTime = getExecTime(st.op);
-		result = getResult(st);
+		
 	}
 	
-	public void issueInstruction(Instruction curr) {
+	public boolean issueInstruction(Instruction curr) {
 		for(ReserStation station: stations) {
 			if(!station.isBusy()) {
 				station.issueIn(curr);
-				break;
+				return true;//成功加入到保留站中
+				//break;
 			}
 		}
+		return false;
 	}
 	
 }
