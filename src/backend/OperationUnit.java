@@ -177,7 +177,8 @@ public class OperationUnit {
 			currentExec.busy = false;
 			currentExec = null;
 			if(currentExec.op == OP.LD) {
-				lo++;
+				//lo++;
+				lo = (lo + 1) % stations.length;
 			}
 			
 			chooseNewExec();
@@ -188,7 +189,8 @@ public class OperationUnit {
 				FloatPointUnit.memory[currentExec.a] = currentExec.vk;
 				currentExec.busy = false;
 				currentExec = null;
-				lo++;
+				//lo++;
+				lo = (lo + 1) % stations.length;
 				
 				chooseNewExec();
 			}
