@@ -49,6 +49,9 @@ public class ReserStation {
 		}
 		// handle target register
 		qi.setSourceStation(inst.target, this);
+		
+		this.busy = true;
+		//需要修改为busy
 	}
 
 	public ReserStation(String name) {

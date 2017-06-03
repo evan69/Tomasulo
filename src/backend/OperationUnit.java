@@ -10,6 +10,10 @@ public class OperationUnit {
 	ReserStation currentExec;
 	int currentTime;
 	float result;
+	
+	int hi = 0;
+	int lo = 0;
+	// queue for LOAD / STORE
 	/**
 	 * @param stationNum is number of stations, like 2 for multiple/divide, 3 for load
 	 * @param stationType is one of  "MULD", "ADDD", "LOAD", "STORE"
@@ -67,18 +71,40 @@ public class OperationUnit {
 		}
 	}
 	
+	//LOAD / STORE 检测队列是否满
+	public boolean checkFull() {
+		if(hi == lo && stations[lo].busy == true) {
+			//已经满了
+			return true;
+		}
+		return false;
+	}
+	
+	//LOAD / STORE 检测队列是否空
+	public boolean checkEmpty() {
+		if(hi == lo && stations[lo].busy == false) {
+			//已经空了
+			return true;
+		}
+		return false;
+	}
+	
 	//选择一个保留站执行
 	private ReserStation chooseStation() {
 		switch (operation) 
 		{
 			case LOAD:
 			case STORE:
+				/*
 				for(ReserStation st : stations)
 				{
 					if(!st.isBusy())
 						continue;
 					return st;
 				}
+				*/
+				if(!checkEmpty())
+					return stations[lo];
 				// TODO : 需要将访存部件保留站修改为队列结构，获取头部
 				break;
 			case ADD:
@@ -142,6 +168,9 @@ public class OperationUnit {
 			//交给CDB
 			currentExec.busy = false;
 			currentExec = null;
+			if(currentExec.op == OP.LD) {
+				lo++;
+			}
 		}
 		else {
 			//是store指令，应在写回阶段写mem
@@ -149,6 +178,7 @@ public class OperationUnit {
 				FloatPointUnit.memory[currentExec.a] = currentExec.vk;
 				currentExec.busy = false;
 				currentExec = null;
+				lo++;
 			}
 		}
 		
@@ -156,12 +186,24 @@ public class OperationUnit {
 	}
 	
 	public boolean issueInstruction(Instruction curr) {
-		for(ReserStation station: stations) {
-			if(!station.isBusy()) {
-				station.issueIn(curr);
-				return true;//成功加入到保留站中
-				//break;
+		if(operation == UnitType.ADD || operation == UnitType.MULT) {
+			for(ReserStation station: stations) {
+				if(!station.isBusy()) {
+					station.issueIn(curr);
+					return true;//成功加入到保留站中
+					//break;
+				}
 			}
+		}
+		else {
+			if(checkFull()) {
+				//已经满了
+				return false;
+			}
+			ReserStation station = stations[hi];
+			station.issueIn(curr);
+			hi = (hi + 1) % stations.length;
+			return true;
 		}
 		return false;
 	}
