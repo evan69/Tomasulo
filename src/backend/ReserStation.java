@@ -33,7 +33,14 @@ public class ReserStation {
 		switch (inst.op) {
 		case LD:
 		case ST:	// memory related
-			// TODO : 对于store指令，除了立即数应该还有一个源寄存器，按照书上来说应该是Qk
+			// fix : 对于store指令，除了立即数应该还有一个源寄存器，按照书上来说应该是Qk
+			if(qi.isRegToWrite(inst.operand1)) {
+				vk = qi.getRegValue(inst.operand1);
+				qk = null;
+			} else {
+				qk = qi.getSourceStation(inst.operand1); 
+			}
+			// fixed see above
 			a = inst.immidate;
 			break;
 		default:	// registers only

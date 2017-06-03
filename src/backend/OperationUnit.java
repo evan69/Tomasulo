@@ -53,6 +53,7 @@ public class OperationUnit {
 			case MULD:
 				return st.vj * st.vk;
 			case DIVD:
+				assert st.vk != 0.0;
 				return st.vj / st.vk;
 				//TODO : 可能的除0错误？
 			case LD:
@@ -139,12 +140,15 @@ public class OperationUnit {
 			CDB cdb = CDB.getInstance();
 			cdb.broadcast(currentExec, result);
 			//交给CDB
+			currentExec.busy = false;
+			currentExec = null;
 		}
 		else {
 			//是store指令，应在写回阶段写mem
 			if(currentExec.qk == null) {
 				FloatPointUnit.memory[currentExec.a] = currentExec.vk;
 				currentExec.busy = false;
+				currentExec = null;
 			}
 		}
 		
