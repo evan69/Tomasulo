@@ -4,12 +4,12 @@ import backend.FloatPointUnit.OP;
 
 public class ReserStation {
 	private String name;	// sth like MULT1, ADD1
-	private boolean busy = false;
+	public boolean busy = false;
 	public ReserStation qj, qk;
 	public RegStates qi;
 	float vj, vk;
-	private int a;
-	private OP op;
+	public int a;
+	public OP op;
 	int cnt = 0;			// cnt is together with op
 	
 	private void doOperand(int operand1, int operand2) {
@@ -33,6 +33,7 @@ public class ReserStation {
 		switch (inst.op) {
 		case LD:
 		case ST:	// memory related
+			// TODO : 对于store指令，除了立即数应该还有一个源寄存器，按照书上来说应该是Qk
 			a = inst.immidate;
 			break;
 		default:	// registers only
@@ -55,5 +56,5 @@ public class ReserStation {
 	public boolean isBusy() {
 		return busy;
 	}
-
+	
 }

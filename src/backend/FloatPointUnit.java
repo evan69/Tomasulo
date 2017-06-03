@@ -12,7 +12,7 @@ public class FloatPointUnit {
 		ADD, MULT, LOAD, STORE
 	};
 	//4个保留站，每个可能被多种运算共享
-	float memory[] = new float[4096];
+	static float memory[] = new float[4096];
 	OperationUnit addUnit = new OperationUnit(3, UnitType.ADD);
 	OperationUnit multUnit = new OperationUnit(2, UnitType.MULT);
 	OperationUnit ldUnit = new OperationUnit(3, UnitType.LOAD);
@@ -20,6 +20,9 @@ public class FloatPointUnit {
 	Queue<Instruction> instQueue = new LinkedList<Instruction>();
 	public void update() {
 		// TODO
+		issueInstruction();
+		execute();
+		writeBack();
 	}
 	
 	public void issueInstruction() {
@@ -43,5 +46,20 @@ public class FloatPointUnit {
 			System.out.println(currentI.op);
 			break;
 		}
+		// TODO : 可能的问题：如果保留站满了怎么办，如果队列为空怎么办？
+	}
+	
+	private void execute() {
+		addUnit.execute();
+		multUnit.execute();
+		ldUnit.execute();
+		stUnit.execute();
+	}
+	
+	private void writeBack() {
+		addUnit.writeBack();
+		multUnit.writeBack();
+		ldUnit.writeBack();
+		stUnit.writeBack();
 	}
 }
