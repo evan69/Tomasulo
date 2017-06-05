@@ -13,14 +13,14 @@ public class ReserStation {
 	int cnt = 0;			// cnt is together with op
 	
 	private void doOperand(int operand1, int operand2) {
-		if(qi.isRegToWrite(operand1)) {
+		if(!qi.isRegToWrite(operand1)) {
 			vj = qi.getRegValue(operand1);
 			qj = null;
 		} else {
 			qj = qi.getSourceStation(operand1);
 		}
 		
-		if(qi.isRegToWrite(operand2)) {
+		if(!qi.isRegToWrite(operand2)) {
 			vk = qi.getRegValue(operand2);
 			qk = null;
 		} else {
@@ -30,6 +30,7 @@ public class ReserStation {
 	
 	public void issueIn(Instruction inst) {
 		// handle source registers
+		this.op = inst.op;
 		switch (inst.op) {
 		case LD:
 		case ST:	// memory related

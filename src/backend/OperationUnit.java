@@ -159,6 +159,7 @@ public class OperationUnit {
 			currentExec = st;
 			currentTime = getExecTime(st.op);
 			result = getResult(st);
+			System.out.println("choose nex exec " + result);
 		}
 	}
 	
@@ -175,12 +176,11 @@ public class OperationUnit {
 			cdb.broadcast(currentExec, result);
 			//交给CDB
 			currentExec.busy = false;
-			currentExec = null;
 			if(currentExec.op == OP.LD) {
 				//lo++;
 				lo = (lo + 1) % stations.length;
 			}
-			
+			currentExec = null;
 			chooseNewExec();
 		}
 		else {

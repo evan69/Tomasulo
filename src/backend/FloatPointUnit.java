@@ -18,12 +18,26 @@ public class FloatPointUnit {
 	OperationUnit ldUnit = new OperationUnit(3, UnitType.LOAD);
 	OperationUnit stUnit = new OperationUnit(3, UnitType.STORE);
 	Queue<Instruction> instQueue = new LinkedList<Instruction>();
+	CDB cdb = CDB.getInstance();
+	public FloatPointUnit() {
+		cdb.setFPU(this);
+	}
+	RegStates regs = RegStates.getInstance();
 	public void update() {
 		// TODO
 		//疑问：一周期能进入多条指令还是一条
 		issueInstruction();
 		execute();
 		writeBack();
+		System.out.println("update finished");
+	}
+	
+	public void setReg(int ind, float v) {
+		regs.setReg(ind, v);
+	}
+	
+	public void addInstruction(Instruction instruction) {
+		instQueue.add(instruction);
 	}
 	
 	public void issueInstruction() {

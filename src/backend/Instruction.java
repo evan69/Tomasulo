@@ -15,8 +15,9 @@ public class Instruction {
 		this.op = op;
 	}
 	
-	public Instruction(OP op, int immidate) {
+	public Instruction(OP op, String tar, int immidate) {
 		this.op = op;
+		this.target = Integer.parseInt(tar.substring(1));
 		this.immidate = immidate;
 	}
 }

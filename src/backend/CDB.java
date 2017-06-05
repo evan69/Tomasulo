@@ -38,6 +38,7 @@ public class CDB {
 	 * should only be called once in one <code>fpu.update()</code> 
 	 * */
 	public void broadcast(ReserStation broadcaster, float result) {
+		System.out.println("station " + broadcaster.getName() + " boradcast " + result);
 		this.broadcaster = broadcaster;
 		this.result = result;
 		broadcast2OperUnit(fpu.addUnit);
