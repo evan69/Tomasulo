@@ -10,6 +10,10 @@ public class OperationUnit {
 	//ReserStation currentExec;
 	//int currentTime;
 	//float result;
+	public static final int[] MULT_STAGES = {1, 2, 2, 2, 2, 1};
+	public static final int[] DIV_STAGES = {40};
+	public static final int[] MEM_STAGES = {1, 1};
+	public static final int[] ADD_STAGES = {1, 1};
 	
 	int hi = 0;
 	int lo = 0;
@@ -28,23 +32,23 @@ public class OperationUnit {
 	}
 	
 	//获取每个指令对应的执行周期数
-	private int getExecTime(OP op) {
-		switch (op)
-		{
-			case ADDD:
-			case SUBD:
-				return 2;
-			case MULD:
-				return 10;
-			case DIVD:
-				return 40;
-			case LD:
-			case ST:
-				return 2;
-			default:
-				return -1;
-		}
-	}
+//	private int getExecTime(OP op) {
+//		switch (op)
+//		{
+//			case ADDD:
+//			case SUBD:
+//				return 2;
+//			case MULD:
+//				return 10;
+//			case DIVD:
+//				return 40;
+//			case LD:
+//			case ST:
+//				return 2;
+//			default:
+//				return -1;
+//		}
+//	}
 	
 	//执行阶段被调用，获取计算结果（除store返回0不代表计算结果）
 	private float getResult(ReserStation st) {
@@ -139,8 +143,11 @@ public class OperationUnit {
 		for(ReserStation st : stations) {
 			if(st.isBusy() && st.isExcuting) {
 				//正在执行
-				if(st.currentTime > 0) {
-					st.currentTime--;
+				if(--st.currentTime <= 0) {	// finished this stage
+					++st.stage;
+					if(st.stage < st.stages.length) {
+						st.currentTime = st.stages[st.stage];
+					}
 				}
 			}
 		}
@@ -175,7 +182,8 @@ public class OperationUnit {
 		if(st == null)
 			return;
 		st.isExcuting = true;
-		st.currentTime = getExecTime(st.op);
+		st.stage = 0;
+		st.currentTime = st.stages[st.stage]; 
 		st.result = getResult(st);
 		System.out.println("choose nex exec " + st.result);
 	}
@@ -185,7 +193,7 @@ public class OperationUnit {
 			if(!st.isBusy() || !st.isExcuting) {
 				continue;
 			}
-			if(st.currentTime > 0)
+			if(st.stage < st.stages.length)	// execution not finished
 				return;
 			if(st.op != OP.ST) {
 				//不是store指令

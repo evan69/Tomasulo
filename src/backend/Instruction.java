@@ -4,9 +4,9 @@ import backend.FloatPointUnit.OP;
 
 public class Instruction {
 	OP op;
-	int immidate;
-	int target;
-	int operand1, operand2;
+	int immidate = -1;
+	int target = -1;
+	int operand1 = -1, operand2 = -1;
 	
 	public Instruction(OP op, String tar, String op1, String op2) {
 		target = Integer.parseInt(tar.substring(1));

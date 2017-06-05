@@ -10,10 +10,11 @@ public class ReserStation {
 	public float vj, vk;
 	public int a;
 	public OP op;
-	int cnt = 0; // cnt is together with op
-	
+
+	public int[] stages;
+	public int stage;			// together with op. if add/sub, {0, 1}; if mult, {0, ..., 9}; if div, {0...39}
 	public boolean isExcuting;
-	public int currentTime;
+	public int currentTime;		// in this stage
 	public float result;
 
 	private void doOperand(int operand1, int operand2) {
@@ -35,10 +36,9 @@ public class ReserStation {
 	public void issueIn(Instruction inst) {
 		// handle source registers
 		this.op = inst.op;
-		switch (inst.op) {
-		case LD:
-		case ST: // memory related
+		if(inst.op == OP.LD || inst.op == OP.ST) { // memory related
 			// fix : 对于store指令，除了立即数应该还有一个源寄存器，按照书上来说应该是Qk
+			this.stages = OperationUnit.MEM_STAGES;
 			if (qi.isRegToWrite(inst.operand1)) {
 				vk = qi.getRegValue(inst.operand1);
 				qk = null;
@@ -47,14 +47,26 @@ public class ReserStation {
 			}
 			// fixed see above
 			a = inst.immidate;
-			break;
-		default: // registers only
+		} else {// registers only
 			doOperand(inst.operand1, inst.operand2);
-			break;
+			switch (op) {
+			case ADDD:
+			case SUBD:
+				stages = OperationUnit.ADD_STAGES;
+				break;
+			case MULD:
+				stages = OperationUnit.MULT_STAGES;
+				break;
+			case DIVD:
+				stages = OperationUnit.DIV_STAGES;
+			default:
+				break;
+			}
 		}
-		// handle target register
-		qi.setSourceStation(inst.target, this);
-
+		
+		if(inst.op != OP.ST) {	// handle target register
+			qi.setSourceStation(inst.target, this);
+		}
 		this.busy = true;
 		// 需要修改为busy
 		this.isExcuting = false;
@@ -89,7 +101,9 @@ public class ReserStation {
 				break;
 			}
 		}
-		return getName() + "\t busy:" + busy + "\t excuting:" + isExcuting + "\t" + info;
+		return getName() + "\t busy: " + busy + 
+				"\t gonna excuting: " + (isExcuting ?("period " + currentTime + " of stage " + stage): "false") +
+				"\t" + info;
 	}
 
 }
