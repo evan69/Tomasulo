@@ -38,6 +38,7 @@ public class FloatPointUnit {
 		issueInstruction();
 		execute();
 		writeBack();
+		startNewExec();//added choose instr here
 		display();
 		System.out.println("update finished");
 	}
@@ -79,13 +80,20 @@ public class FloatPointUnit {
 			System.out.println(currentI.op);
 			break;
 		}
-		
+		//System.out.println(issueInResult);
 		//如果保留站有空位，成功加入，则要从指令队列中去除一条指令
 		if(issueInResult == true) {
 			instQueue.poll();
 		}
 		
 		// fixed : 可能的问题：如果保留站满了怎么办，如果队列为空怎么办？
+	}
+	
+	private void startNewExec() {
+		addUnit.startNewExec();
+		multUnit.startNewExec();
+		ldUnit.startNewExec();
+		stUnit.startNewExec();
 	}
 	
 	private void execute() {

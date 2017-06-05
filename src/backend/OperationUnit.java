@@ -7,9 +7,9 @@ public class OperationUnit {
 //	int ttlPeriod;
 	ReserStation[] stations;
 	UnitType operation;	// like "MULD", "ADDD", "LOAD", "STORE"
-	ReserStation currentExec;
-	int currentTime;
-	float result;
+	//ReserStation currentExec;
+	//int currentTime;
+	//float result;
 	
 	int hi = 0;
 	int lo = 0;
@@ -109,10 +109,19 @@ public class OperationUnit {
 				break;
 			case ADD:
 			case MULT:
+				if(isExcutingDivide())
+					break;
+				//正在执行除法，则无法选取执行
 				for(ReserStation st : stations)
 				{
 					if(!st.isBusy())
 						continue;
+					if(st.isExcuting)
+						continue;
+					//如果正在执行，也不选
+					if(st.op == OP.DIVD && isExcutingInstr())
+						continue;
+					//如果有指令在执行，则不能开始执行除法
 					if(st.qj != null || st.qk != null)
 						continue;
 					//RegStates state = st.qi;
@@ -127,75 +136,81 @@ public class OperationUnit {
 	
 	//执行
 	public void execute() {
-		//System.out.println(currentTime);
-		assert currentTime >= 0 : "error";
-		if(currentExec != null)
-			//exec current instr
-		{
-			if(currentTime > 0)
-				currentTime--;
+		for(ReserStation st : stations) {
+			if(st.isBusy() && st.isExcuting) {
+				//正在执行
+				if(st.currentTime > 0) {
+					st.currentTime--;
+				}
+			}
 		}
-		/*
-		else
-			//choose another instr to exec
-		{
-			ReserStation st = chooseStation();
-			if(st == null)
-				return;
-			currentExec = st;
-			currentTime = getExecTime(st.getOP());
-			result = getResult(st);
+	}
+	
+	//是否有除法在执行
+	private boolean isExcutingDivide() {
+		if(this.operation == UnitType.MULT) {
+			for(ReserStation st : stations) {
+				if(st.isBusy() && st.isExcuting && st.op == OP.DIVD) {
+					return true;
+				}
+			}
 		}
-		*/
+		return false;
+	}
+	
+	//是否有指令在执行
+	private boolean isExcutingInstr() {
+		for(ReserStation st : stations) {
+			if(st.isBusy() && st.isExcuting) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	//选择一条指令准备执行
-	private void chooseNewExec() {
-		if(currentExec == null) {
-			//选取一个新的指令开始执行
-			ReserStation st = chooseStation();
-			if(st == null)
-				return;
-			currentExec = st;
-			currentTime = getExecTime(st.op);
-			result = getResult(st);
-			System.out.println("choose nex exec " + result);
-		}
+	public void startNewExec() {
+		//选取一个新的指令开始执行
+		ReserStation st = chooseStation();
+		if(st == null)
+			return;
+		st.isExcuting = true;
+		st.currentTime = getExecTime(st.op);
+		st.result = getResult(st);
+		System.out.println("choose nex exec " + st.result);
 	}
 	
 	public void writeBack() {
-		if(currentExec == null) {
-			chooseNewExec();
-			return;
-		}
-		if(currentTime > 0)
-			return;
-		if(currentExec.op != OP.ST) {
-			//不是store指令
-			CDB cdb = CDB.getInstance();
-			cdb.broadcast(currentExec, result);
-			//交给CDB
-			currentExec.busy = false;
-			if(currentExec.op == OP.LD) {
-				//lo++;
-				lo = (lo + 1) % stations.length;
+		for(ReserStation st : stations) {
+			if(!st.isBusy() || !st.isExcuting) {
+				continue;
 			}
-			currentExec = null;
-			chooseNewExec();
-		}
-		else {
-			//是store指令，应在写回阶段写mem
-			if(currentExec.qk == null) {
-				FloatPointUnit.memory[currentExec.a] = currentExec.vk;
-				currentExec.busy = false;
-				currentExec = null;
-				//lo++;
-				lo = (lo + 1) % stations.length;
-				
-				chooseNewExec();
+			if(st.currentTime > 0)
+				return;
+			if(st.op != OP.ST) {
+				//不是store指令
+				CDB cdb = CDB.getInstance();
+				cdb.broadcast(st, st.result);
+				//交给CDB
+				st.isExcuting = false;
+				st.busy = false;
+				if(st.op == OP.LD) {
+					//lo++;
+					lo = (lo + 1) % stations.length;
+				}
+			}
+			else {
+				//是store指令，应在写回阶段写mem
+				if(st.qk == null) {
+					FloatPointUnit.memory[st.a] = st.vk;
+					st.isExcuting = false;
+					st.busy = false;
+					st = null;
+					//lo++;
+					lo = (lo + 1) % stations.length;
+				}
 			}
 		}
-		
 		
 	}
 	
@@ -227,7 +242,7 @@ public class OperationUnit {
 		String res = "unitType: " + operation.toString() + "\n";
 		if(stations != null) {
 			for(ReserStation st: stations) {
-				if(st == currentExec) {
+				if(st.isExcuting) {
 					res += "> " + st + "\n";
 				} else {
 					res += st + "\n";

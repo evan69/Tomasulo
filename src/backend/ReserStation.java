@@ -7,10 +7,14 @@ public class ReserStation {
 	public boolean busy = false;
 	public ReserStation qj, qk;
 	public RegStates qi;
-	float vj, vk;
+	public float vj, vk;
 	public int a;
 	public OP op;
 	int cnt = 0; // cnt is together with op
+	
+	public boolean isExcuting;
+	public int currentTime;
+	public float result;
 
 	private void doOperand(int operand1, int operand2) {
 		if (!qi.isRegToWrite(operand1)) {
@@ -53,6 +57,7 @@ public class ReserStation {
 
 		this.busy = true;
 		// 需要修改为busy
+		this.isExcuting = false;
 	}
 
 	public ReserStation(String name) {

@@ -9,7 +9,8 @@ public class Main {
 //		new Instruction(OP.LD, "F1", 0),
 		new Instruction(OP.ADDD, "F2", "F1", "F1"),
 		new Instruction(OP.DIVD, "F3", "F2", "F1"),
-		new Instruction(OP.SUBD, "F4", "F2", "F3")
+		new Instruction(OP.SUBD, "F4", "F2", "F3"),
+		new Instruction(OP.ADDD, "F4", "F2", "F3")
 	};
 	public static void main(String[] args) {
 		System.out.println("test");
@@ -22,7 +23,7 @@ public class Main {
 		for(int i = 0; i < testInstr.length; ++i) {
 			cpu.addInstruction(testInstr[i]);
 		}
-		for(int i = 0; ; i++) {
+		for(int i = 0; i < 100 ; i++) {
 			System.out.println("update " + i);
 			cpu.update();
 		}
