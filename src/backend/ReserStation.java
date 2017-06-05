@@ -89,7 +89,7 @@ public class ReserStation {
 				break;
 			}
 		}
-		return getName() + "\t" + busy + "\t" + info;
+		return getName() + "\t busy:" + busy + "\t excuting:" + isExcuting + "\t" + info;
 	}
 
 }
