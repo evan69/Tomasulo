@@ -222,4 +222,19 @@ public class OperationUnit {
 		return false;
 	}
 	
+	@Override
+	public String toString() {
+		String res = "unitType: " + operation.toString() + "\n";
+		if(stations != null) {
+			for(ReserStation st: stations) {
+				if(st == currentExec) {
+					res += "> " + st + "\n";
+				} else {
+					res += st + "\n";
+				}
+			}
+		}
+		return res;
+	}
+	
 }

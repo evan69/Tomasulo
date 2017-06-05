@@ -22,7 +22,10 @@ public class Main {
 		for(int i = 0; i < testInstr.length; ++i) {
 			cpu.addInstruction(testInstr[i]);
 		}
-		while(true)
+		for(int i = 0; ; i++) {
+			System.out.println("update " + i);
 			cpu.update();
+		}
+			
 	}
 }

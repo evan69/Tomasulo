@@ -23,12 +23,22 @@ public class FloatPointUnit {
 		cdb.setFPU(this);
 	}
 	RegStates regs = RegStates.getInstance();
+	
+	public void display() {
+		System.out.println(addUnit);
+		System.out.println(multUnit);
+		System.out.println(ldUnit);
+		System.out.println(stUnit);
+		System.out.println("\n\n\n");
+	}
+	
 	public void update() {
 		// TODO
 		//疑问：一周期能进入多条指令还是一条
 		issueInstruction();
 		execute();
 		writeBack();
+		display();
 		System.out.println("update finished");
 	}
 	
