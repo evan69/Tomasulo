@@ -2,6 +2,7 @@ package backend;
 
 import backend.FloatPointUnit.OP;
 import backend.FloatPointUnit.UnitType;
+import javafx.stage.Stage;
 
 public class OperationUnit {
 //	int ttlPeriod;
@@ -14,7 +15,7 @@ public class OperationUnit {
 	public static final int[] DIV_STAGES = {40};
 	public static final int[] MEM_STAGES = {1, 1};
 	public static final int[] ADD_STAGES = {1, 1};
-	
+	private boolean[] used;
 	int hi = 0;
 	int lo = 0;
 	// queue for LOAD / STORE
@@ -29,26 +30,19 @@ public class OperationUnit {
 		for(int i = 0; i < stationNum; ++i) {
 			stations[i] = new ReserStation(operation.toString() + i);
 		}
+		switch (operation) {
+		case ADD:
+		case LOAD:
+		case STORE:
+			used = new boolean[2];
+			break;
+		case MULT:
+			used = new boolean[6];
+			break;
+		default:
+			break;
+		}
 	}
-	
-	//获取每个指令对应的执行周期数
-//	private int getExecTime(OP op) {
-//		switch (op)
-//		{
-//			case ADDD:
-//			case SUBD:
-//				return 2;
-//			case MULD:
-//				return 10;
-//			case DIVD:
-//				return 40;
-//			case LD:
-//			case ST:
-//				return 2;
-//			default:
-//				return -1;
-//		}
-//	}
 	
 	//执行阶段被调用，获取计算结果（除store返回0不代表计算结果）
 	private float getResult(ReserStation st) {
@@ -74,7 +68,7 @@ public class OperationUnit {
 				return 0;
 		}
 	}
-	
+
 	//LOAD / STORE 检测队列是否满
 	public boolean checkFull() {
 		if(hi == lo && stations[lo].busy == true) {
@@ -113,11 +107,10 @@ public class OperationUnit {
 				break;
 			case ADD:
 			case MULT:
-				if(isExcutingDivide())
+				if(isExcutingDivide() || !used[0])
 					break;
 				//正在执行除法，则无法选取执行
-				for(ReserStation st : stations)
-				{
+				for(ReserStation st : stations) {
 					if(!st.isBusy())
 						continue;
 					if(st.isExcuting)
@@ -143,11 +136,22 @@ public class OperationUnit {
 		for(ReserStation st : stations) {
 			if(st.isBusy() && st.isExcuting) {
 				//正在执行
-				if(--st.currentTime <= 0) {	// finished this stage
-					++st.stage;
-					if(st.stage < st.stages.length) {
+				if(st.currentTime > 0) {
+					--st.currentTime;
+				}
+				if(st.currentTime == 0) {	// finished this stage
+					if(st.stage < st.stages.length - 1 && !used[st.stage + 1]) {
+						used[st.stage] = false;	// give up the previous stage
+						++st.stage;
+						used[st.stage] = true;	// occupy the next stage
 						st.currentTime = st.stages[st.stage];
+					} else if(st.stage == st.stages.length - 1) {
+						++st.stage;	// execution finished
 					}
+//					++st.stage;
+//					if(st.stage < st.stages.length) {
+//						st.currentTime = st.stages[st.stage];
+//					}
 				}
 			}
 		}
@@ -182,12 +186,15 @@ public class OperationUnit {
 		if(st == null)
 			return;
 		st.isExcuting = true;
+		if(st.op != OP.DIVD) {
+			used[0] = true;
+		}
 		st.stage = 0;
 		st.currentTime = st.stages[st.stage]; 
 		st.result = getResult(st);
 		System.out.println("choose nex exec " + st.result);
 	}
-	
+
 	public void writeBack() {
 		for(ReserStation st : stations) {
 			if(!st.isBusy() || !st.isExcuting) {
@@ -256,6 +263,46 @@ public class OperationUnit {
 					res += st + "\n";
 				}
 			}
+		}
+		return res;
+	}
+	
+	public String showContent() {
+		String res = "";
+		switch(operation) {
+		case ADD:
+		case MULT:
+			if(stations != null) {
+				for(ReserStation st : stations) {
+					res += st.getName() + "\t";
+					res += st.isBusy() ? "yes\t" : "no\t";
+					res += (st.op == null ? "--" :st.op.toString()) + "\t";
+					res += ((st.qj == null ? " " : st.qj.getName())) + "\t";
+					res += ((st.qk == null ? " " : st.qk.getName())) + "\t";
+					res += (st.qj == null ? st.vj : " ") + "\t";
+					res += (st.qj == null ? st.vk : " ") + "\n";
+				}
+			}
+			break;
+		case LOAD:
+			if(stations != null) {
+				for(ReserStation st : stations) {
+					res += st.getName() + "\t";
+					res += st.isBusy() ? "yes\t" : "no\t";
+					res += st.a + "\t \n";
+				}
+			}
+			break;
+		case STORE:
+			if(stations != null) {
+				for(ReserStation st : stations) {
+					res += st.getName() + "\t";
+					res += st.isBusy() ? "yes\t" : "no\t";
+					res += st.a + "\t";
+					res += ((st.qk == null ? st.vk : st.qk.getName()) + "\n");
+				}
+			}
+			break;
 		}
 		return res;
 	}

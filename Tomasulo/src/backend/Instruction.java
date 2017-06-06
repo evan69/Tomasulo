@@ -17,7 +17,14 @@ public class Instruction {
 	
 	public Instruction(OP op, String tar, int immidate) {
 		this.op = op;
-		this.target = Integer.parseInt(tar.substring(1));
+		if(op == OP.LD) {
+			this.target = Integer.parseInt(tar.substring(1));
+		} else if(op == op.ST) {
+			this.operand1 = Integer.parseInt(tar.substring(1));
+		} else {
+			assert false;
+		}
+		
 		this.immidate = immidate;
 	}
 }

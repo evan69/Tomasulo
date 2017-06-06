@@ -3,15 +3,17 @@ package backend;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import com.sun.webkit.ContextMenu.ShowContext;
+
 public class FloatPointUnit {
 	public enum OP {
 		ADDD, SUBD, MULD, DIVD, LD, ST
 	}; 
-	//6绉嶈繍绠�
+	//6种运算
 	public enum UnitType {
 		ADD, MULT, LOAD, STORE
 	};
-	//4涓繚鐣欑珯锛屾瘡涓彲鑳借澶氱杩愮畻鍏变韩
+	//4个保留站，每个可能被多种运算共享
 	public static float memory[] = new float[4096];
 	OperationUnit addUnit = new OperationUnit(3, UnitType.ADD);
 	OperationUnit multUnit = new OperationUnit(2, UnitType.MULT);
@@ -32,14 +34,13 @@ public class FloatPointUnit {
 		System.out.println("\n\n\n");
 	}
 	
-	
-	public String show() {
-		return "" + addUnit + multUnit + ldUnit + stUnit;
+	public String showReserStations() {
+		return addUnit.showContent() + multUnit.showContent() + ldUnit.showContent() + stUnit.showContent();
 	}
 	
 	public void update() {
 		// TODO
-		//鐤戦棶锛氫竴鍛ㄦ湡鑳借繘鍏ュ鏉℃寚浠よ繕鏄竴鏉�
+		//疑问：一周期能进入多条指令还是一条
 		issueInstruction();
 		execute();
 		writeBack();
@@ -61,10 +62,10 @@ public class FloatPointUnit {
 		Instruction currentI = instQueue.peek();
 		if(currentI == null)
 			return;
-		//鎸囦护搴忓垪閲岄潰娌℃湁鎸囦护锛岀洿鎺ョ粨鏉�
+		//指令序列里面没有指令，直接结束
 		
 		boolean issueInResult = false;
-		//瀵瑰簲鐨勯儴浠舵槸鍚︽湁绌虹殑淇濈暀绔欙紝鎴栬�呰鏄惁鎴愬姛鍔犲埌淇濈暀绔欓噷
+		//对应的部件是否有空的保留站，或者说是否成功加到保留站里
 		
 		switch (currentI.op) {
 		case ADDD:
@@ -86,12 +87,12 @@ public class FloatPointUnit {
 			break;
 		}
 		//System.out.println(issueInResult);
-		//濡傛灉淇濈暀绔欐湁绌轰綅锛屾垚鍔熷姞鍏ワ紝鍒欒浠庢寚浠ら槦鍒椾腑鍘婚櫎涓�鏉℃寚浠�
+		//如果保留站有空位，成功加入，则要从指令队列中去除一条指令
 		if(issueInResult == true) {
 			instQueue.poll();
 		}
 		
-		// fixed : 鍙兘鐨勯棶棰橈細濡傛灉淇濈暀绔欐弧浜嗘�庝箞鍔烇紝濡傛灉闃熷垪涓虹┖鎬庝箞鍔烇紵
+		// fixed : 可能的问题：如果保留站满了怎么办，如果队列为空怎么办？
 	}
 	
 	private void startNewExec() {

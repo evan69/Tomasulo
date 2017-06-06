@@ -27,6 +27,6 @@ public class Main {
 			System.out.println("update " + i);
 			cpu.update();
 		}
-			
+		
 	}
 }

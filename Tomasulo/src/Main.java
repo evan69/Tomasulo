@@ -27,6 +27,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
+import backend.*;
+import backend.FloatPointUnit.OP;
 
 public class Main extends JFrame implements ActionListener {
 
@@ -37,6 +39,7 @@ public class Main extends JFrame implements ActionListener {
 	private int cmdn;
 	private JPanel panel_instr,instp;
 	private JScrollPane scroll_panel_instr;
+	private FloatPointUnit fpu;
 	/*
 	 * 指令内容、三个操作数
 	 */
@@ -294,7 +297,14 @@ public class Main extends JFrame implements ActionListener {
 		stinit();
 		display();
 	}
+	
+	
+	
+	
 	private Main() {
+		backend();
+		
+		
 		FlowLayout all_layout = new FlowLayout(FlowLayout.LEFT);
 		getContentPane().setLayout(all_layout);
 
@@ -344,87 +354,24 @@ public class Main extends JFrame implements ActionListener {
 	
 	
 	
+	
+	
+	private void backend() {
+		// TODO Auto-generated method stub
+		fpu = new FloatPointUnit();
+		for(int i = 0; i < 11; ++i) {
+			fpu.setReg(i, 0);
+		}
+		for (int i = 0; i<4096; i++)
+			fpu.memory[i] = 0.0f;
+	}
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		new Main();
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		//-----------------------------------------指令队列------------------------------------------	
-		int cmdnn = cmdn * 4;
-		for (int i = 0; i < cmdnn; i = i + 4) {//
-			if (e.getSource() == instbox[i]) {
-				if (instbox[i].getSelectedIndex() == 0){
-					instbox[i + 1].removeAllItems();
-					instbox[i + 2].removeAllItems();
-					instbox[i + 3].removeAllItems();
-				}
-				else if (instbox[i].getSelectedIndex() == 1 
-						|| instbox[i].getSelectedIndex() == 2) {
-					instbox[i + 1].removeAllItems();
-					for (int j = 0; j < fx.length; j++)
-						instbox[i + 1].addItem(fx[j]);
-					instbox[i + 2].removeAllItems();
-					for (int j = 0; j < ix.length; j++)
-						instbox[i + 2].addItem(ix[j]);
-					instbox[i + 3].removeAllItems();
-					for (int j = 0; j < nullx.length; j++)
-						instbox[i + 3].addItem(nullx[j]);
-				} else {
-					instbox[i + 1].removeAllItems();
-					for (int j = 0; j < fx.length; j++)
-						instbox[i + 1].addItem(fx[j]);
-					instbox[i + 2].removeAllItems();
-					for (int j = 0; j < fx.length; j++)
-						instbox[i + 2].addItem(fx[j]);
-					instbox[i + 3].removeAllItems();
-					for (int j = 0; j < fx.length; j++)
-						instbox[i + 3].addItem(fx[j]);
-				}// if-else
-			}// if
-		}// for
-		
-		
-		//-----------------------------------------功能按钮------------------------------------------	
-		if (e.getSource() == startbut) {
-			for (int i = 0; i < cmdnn; i++)
-				instbox[i].setEnabled(false);
-			
-			stepbut.setEnabled(true);
-			stepnbut.setEnabled(true);
-			startbut.setEnabled(false);
-			savebut.setEnabled(false);
-			lookupbut.setEnabled(false);
-			for (int i = 1; i<12; i++)
-				inst_regt[2][i].setEditable(false);
-			for (int i = 1; i<6; i++)
-				inst_memt[1][i].setEditable(false);
 
-			// 根据指令设置的指令初始化其他的面板
-			preparest();
-			// 展示其他面板
-			display();
-/*			cdtp.setVisible(true);
-			loadp.setVisible(true);
-			storep.setVisible(true);
-			rsvp.setVisible(true);
-			regp.setVisible(true);
-			memp.setVisible(true);*/
-		}
-		if (e.getSource() ==resetbut) {
-			cmdn = Integer.valueOf(command_numbers.getText());
-			startbut.setEnabled(true);
-			startbut.setEnabled(true);
-			savebut.setEnabled(true);
-			lookupbut.setEnabled(true);
-			stepbut.setEnabled(false);
-			stepnbut.setEnabled(false);
-			window_clear();
-			window_init();
-		}
-	}
 
 
 
@@ -514,10 +461,10 @@ public class Main extends JFrame implements ActionListener {
 		inst_rsvst[0][1] = "名称";
 		inst_rsvst[0][2] = "Busy";
 		inst_rsvst[0][3] = "Op";
-		inst_rsvst[0][4] = "Vj";
-		inst_rsvst[0][5] = "Vk";
-		inst_rsvst[0][6] = "Qj";
-		inst_rsvst[0][7] = "Qk";
+		inst_rsvst[0][4] = "Qj";
+		inst_rsvst[0][5] = "Qk";
+		inst_rsvst[0][6] = "Vj";
+		inst_rsvst[0][7] = "Vk";
 		inst_rsvst[1][1] = "Add1";
 		inst_rsvst[2][1] = "Add2";
 		inst_rsvst[3][1] = "Add3";
@@ -543,31 +490,33 @@ public class Main extends JFrame implements ActionListener {
 	private void preparest() {
 		// TODO Auto-generated method stub
 		//-----------------------------------------运行状态------------------------------------------	
-		
+		System.out.println("enter preparest");
 		int cmdnn = cmdn + 1;
 		for (int i = 1; i < cmdnn; i++)
 			for (int j = 0; j < 4; j++) {
 				if (j == 0) {
-					int temp = i - 1;
+					int temp = (i - 1) * 4;
 					String disp;
-					disp = inst[instbox[temp * 4].getSelectedIndex()] + "    ";
-					if (instbox[temp * 4].getSelectedIndex() == 0){
+					disp = inst[instbox[temp].getSelectedIndex()] + "    ";
+					if (instbox[temp].getSelectedIndex() == 0){
 						disp = "";
 					}
-					else if (instbox[temp * 4].getSelectedIndex() == 1 
-							|| instbox[temp * 4].getSelectedIndex() == 2) {
+					else if (instbox[temp].getSelectedIndex() == 1 
+							|| instbox[temp].getSelectedIndex() == 2) {
 						disp = disp
-								+ fx[instbox[temp * 4 + 1].getSelectedIndex()]
+								+ fx[instbox[temp + 1].getSelectedIndex()]
 								+ ",  "
-								+ ix[instbox[temp * 4 + 2].getSelectedIndex()]
+								+ ix[instbox[temp + 2].getSelectedIndex()]
 								;
+						fpu.addInstruction(new Instruction(op(instbox[temp].getSelectedIndex()), fx[instbox[temp + 1].getSelectedIndex()], Integer.valueOf(ix[instbox[temp + 2].getSelectedIndex()])));
 					} else {
 						disp = disp
-								+ fx[instbox[temp * 4 + 1].getSelectedIndex()]
+								+ fx[instbox[temp + 1].getSelectedIndex()]
 								+ ",  "
-								+ fx[instbox[temp * 4 + 2].getSelectedIndex()]
+								+ fx[instbox[temp + 2].getSelectedIndex()]
 								+ ",  "
-								+ fx[instbox[temp * 4 + 3].getSelectedIndex()];
+								+ fx[instbox[temp + 3].getSelectedIndex()];
+						fpu.addInstruction(new Instruction(op(instbox[temp].getSelectedIndex()), fx[instbox[temp + 1].getSelectedIndex()], fx[instbox[temp + 2].getSelectedIndex()], fx[instbox[temp + 3].getSelectedIndex()]));
 					}
 					inst_cdtst[i][j] = disp;
 				}// if(j==0)
@@ -578,4 +527,175 @@ public class Main extends JFrame implements ActionListener {
 		
 	}
 
+	private OP op(int op) {
+		// TODO Auto-generated method stub
+		System.out.println("enter OP fun" + inst[op]);
+		if (op == 1)
+			return OP.ST;
+		if (op == 2)
+			return OP.LD;
+		if (op == 3)
+			return OP.ADDD;
+		if (op == 4)
+			return OP.SUBD;
+		if (op == 5)
+			return OP.MULD;
+		if (op == 6)
+			return OP.DIVD;
+		return null;
+	}
+
+
+
+
+	//-----------------------------------------Action------------------------------------------
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		//-----------------------------------------指令队列------------------------------------------	
+		actionInstbox(e);
+		
+		//-----------------------------------------开始按钮------------------------------------------	
+		actionStart(e);
+		
+		//-----------------------------------------执行一步------------------------------------------
+		actionStep(e);
+		
+		//-----------------------------------------重置按钮------------------------------------------	
+		actionReset(e);
+
+	}
+
+
+
+
+	void actionInstbox(ActionEvent e){
+		
+		int cmdnn = cmdn * 4;
+		for (int i = 0; i < cmdnn; i = i + 4) {//
+			if (e.getSource() == instbox[i]) {
+				if (instbox[i].getSelectedIndex() == 0){
+					instbox[i + 1].removeAllItems();
+					instbox[i + 2].removeAllItems();
+					instbox[i + 3].removeAllItems();
+				}
+				else if (instbox[i].getSelectedIndex() == 1 
+						|| instbox[i].getSelectedIndex() == 2) {
+					instbox[i + 1].removeAllItems();
+					for (int j = 0; j < fx.length; j++)
+						instbox[i + 1].addItem(fx[j]);
+					instbox[i + 2].removeAllItems();
+					for (int j = 0; j < ix.length; j++)
+						instbox[i + 2].addItem(ix[j]);
+					instbox[i + 3].removeAllItems();
+					for (int j = 0; j < nullx.length; j++)
+						instbox[i + 3].addItem(nullx[j]);
+				} else {
+					instbox[i + 1].removeAllItems();
+					for (int j = 0; j < fx.length; j++)
+						instbox[i + 1].addItem(fx[j]);
+					instbox[i + 2].removeAllItems();
+					for (int j = 0; j < fx.length; j++)
+						instbox[i + 2].addItem(fx[j]);
+					instbox[i + 3].removeAllItems();
+					for (int j = 0; j < fx.length; j++)
+						instbox[i + 3].addItem(fx[j]);
+				}// if-else
+			}// if
+		}// for
+	}
+	
+
+
+	private void actionReset(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getSource() ==resetbut) {
+			cmdn = Integer.valueOf(command_numbers.getText());
+			startbut.setEnabled(true);
+			startbut.setEnabled(true);
+			savebut.setEnabled(true);
+			lookupbut.setEnabled(true);
+			stepbut.setEnabled(false);
+			stepnbut.setEnabled(false);
+			window_clear();
+			window_init();
+		}
+	}
+
+
+
+
+	private void actionStart(ActionEvent e) {
+		// TODO Auto-generated method stub
+		int cmdnn = cmdn * 4;
+		if (e.getSource() == startbut) {
+			for (int i = 0; i < cmdnn; i++)
+				instbox[i].setEnabled(false);
+			
+			stepbut.setEnabled(true);
+			stepnbut.setEnabled(true);
+			startbut.setEnabled(false);
+			savebut.setEnabled(false);
+			lookupbut.setEnabled(false);
+			for (int i = 1; i<12; i++)
+				inst_regt[2][i].setEditable(false);
+			for (int i = 1; i<6; i++)
+				inst_memt[1][i].setEditable(false);
+
+			// 根据指令设置的指令初始化其他的面板
+			preparest();
+			// 展示其他面板
+			display();
+/*			cdtp.setVisible(true);
+			loadp.setVisible(true);
+			storep.setVisible(true);
+			rsvp.setVisible(true);
+			regp.setVisible(true);
+			memp.setVisible(true);*/
+		}
+		
+	}
+	
+	
+	
+	private void actionStep(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getSource() == stepbut){
+			System.out.println("enter actstep");
+			fpu.update();
+			String[] res = fpu.showReserStations().split("\n");
+			int r = 1;
+			for (int i = 0; i<5; i++, r++){
+				String[] row = res[i].split("\t");
+				inst_rsvst[r][2] = row[1];
+				inst_rsvst[r][3] = row[2];
+				inst_rsvst[r][4] = row[3];
+				inst_rsvst[r][5] = row[4];
+				inst_rsvst[r][6] = row[5];
+				inst_rsvst[r][7] = row[6];				
+			}
+			r = 1;
+			for (int i = 5; i<8; i++,r++){
+				String[] row = res[i].split("\t");
+				
+
+				inst_loadst[r][1] = row[1];
+				inst_loadst[r][2] = row[2];
+				inst_loadst[r][3] = row[3];
+			}
+			r = 1;
+			for (int i = 8; i<11; i++,r++){
+				String[] row = res[i].split("\t");
+				
+
+				inst_storest[r][1] = row[1];
+				inst_storest[r][2] = row[2];
+				inst_storest[r][3] = row[3];
+			}
+	
+		
+		display();
+		}
+	}
 }
