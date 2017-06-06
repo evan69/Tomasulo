@@ -3,6 +3,8 @@ package backend;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import com.sun.webkit.ContextMenu.ShowContext;
+
 public class FloatPointUnit {
 	public enum OP {
 		ADDD, SUBD, MULD, DIVD, LD, ST
@@ -30,6 +32,10 @@ public class FloatPointUnit {
 		System.out.println(ldUnit);
 		System.out.println(stUnit);
 		System.out.println("\n\n\n");
+	}
+	
+	public String showReserStations() {
+		return addUnit.showContent() + multUnit.showContent() + ldUnit.showContent() + stUnit.showContent();
 	}
 	
 	public void update() {
