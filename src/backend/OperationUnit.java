@@ -146,6 +146,7 @@ public class OperationUnit {
 						used[st.stage] = true;	// occupy the next stage
 						st.currentTime = st.stages[st.stage];
 					} else if(st.stage == st.stages.length - 1) {
+						used[st.stage] = false;
 						++st.stage;	// execution finished
 					}
 //					++st.stage;
