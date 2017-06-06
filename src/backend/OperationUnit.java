@@ -202,7 +202,7 @@ public class OperationUnit {
 				continue;
 			}
 			if(st.stage < st.stages.length)	// execution not finished
-				return;
+				continue;
 			if(st.op != OP.ST) {
 				//不是store指令
 				CDB cdb = CDB.getInstance();

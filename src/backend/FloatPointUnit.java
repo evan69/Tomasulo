@@ -40,9 +40,9 @@ public class FloatPointUnit {
 		// TODO
 		//疑问：一周期能进入多条指令还是一条
 		issueInstruction();
+		startNewExec();//added choose instr here
 		execute();
 		writeBack();
-		startNewExec();//added choose instr here
 		display();
 		System.out.println("update finished");
 	}
