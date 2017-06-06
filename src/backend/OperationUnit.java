@@ -107,7 +107,7 @@ public class OperationUnit {
 				break;
 			case ADD:
 			case MULT:
-				if(isExcutingDivide() || !used[0])
+				if(isExcutingDivide() || used[0])
 					break;
 				//正在执行除法，则无法选取执行
 				for(ReserStation st : stations) {
@@ -298,7 +298,7 @@ public class OperationUnit {
 					res += st.getName() + "\t";
 					res += st.isBusy() ? "yes" : "no";
 					res += st.a + "\t";
-					res += st.qk == null ? st.vk : st.qk.getName() + "\n";
+					res += (st.qk == null ? st.vk : st.qk.getName()) + "\n";
 				}
 			}
 		}

@@ -11,7 +11,7 @@ public class RegStates {
 		for(int i = 0; i < regValues.length; ++i) {
 			ret += i + "\t";
 			ret += regValues[i] + "\t";
-			ret += sourceStations[i].getName() + "\n";
+			ret += (sourceStations[i] == null ? " " :sourceStations[i].getName()) + "\n";
 		}
 //		ret += 1 + "\t" + regValues[1] + "\t" + sourceStations[1].getName() + "\n";
 //		ret += 2 + "\t" + regValues[2] + "\t" + sourceStations[2].getName() + "\n";
