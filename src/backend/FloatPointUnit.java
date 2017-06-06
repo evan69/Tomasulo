@@ -9,14 +9,14 @@ public class FloatPointUnit {
 	}; 
 	//6种运算
 	public enum UnitType {
-		ADD, MULT, LOAD, STORE
+		ADD, MULT, MEM
 	};
 	//4个保留站，每个可能被多种运算共享
 	static float memory[] = new float[4096];
 	OperationUnit addUnit = new OperationUnit(3, UnitType.ADD);
 	OperationUnit multUnit = new OperationUnit(2, UnitType.MULT);
-	OperationUnit ldUnit = new OperationUnit(3, UnitType.LOAD);
-	OperationUnit stUnit = new OperationUnit(3, UnitType.STORE);
+	OperationUnit memUnit = new OperationUnit(6, UnitType.MEM);
+//	OperationUnit stUnit = new OperationUnit(3, UnitType.STORE);
 	Queue<Instruction> instQueue = new LinkedList<Instruction>();
 	CDB cdb = CDB.getInstance();
 	public FloatPointUnit() {
@@ -27,17 +27,15 @@ public class FloatPointUnit {
 	public void display() {
 		System.out.println(addUnit);
 		System.out.println(multUnit);
-		System.out.println(ldUnit);
-		System.out.println(stUnit);
+		System.out.println(memUnit);
 		System.out.println("\n\n\n");
 	}
 	
 	public String showReserStations() {
-		return addUnit.showContent() + multUnit.showContent() + ldUnit.showContent() + stUnit.showContent();
+		return addUnit.showContent() + "\n" + multUnit.showContent() + "\n"+ memUnit.showContent();
 	}
 	
 	public void update() {
-		// TODO
 		//疑问：一周期能进入多条指令还是一条
 		issueInstruction();
 		startNewExec();//added choose instr here
@@ -79,10 +77,8 @@ public class FloatPointUnit {
 			issueInResult = multUnit.issueInstruction(currentI);
 			break;
 		case LD:
-			issueInResult = ldUnit.issueInstruction(currentI);
-			break;
 		case ST:
-			issueInResult = stUnit.issueInstruction(currentI);
+			issueInResult = memUnit.issueInstruction(currentI);
 			break;
 		default:
 			System.out.println(currentI.op);
@@ -100,21 +96,18 @@ public class FloatPointUnit {
 	private void startNewExec() {
 		addUnit.startNewExec();
 		multUnit.startNewExec();
-		ldUnit.startNewExec();
-		stUnit.startNewExec();
+		memUnit.startNewExec();
 	}
 	
 	private void execute() {
 		addUnit.execute();
 		multUnit.execute();
-		ldUnit.execute();
-		stUnit.execute();
+		memUnit.execute();
 	}
 	
 	private void writeBack() {
 		addUnit.writeBack();
 		multUnit.writeBack();
-		ldUnit.writeBack();
-		stUnit.writeBack();
+		memUnit.writeBack();
 	}
 }

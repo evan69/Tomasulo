@@ -2,7 +2,6 @@ package backend;
 
 import backend.FloatPointUnit.OP;
 import backend.FloatPointUnit.UnitType;
-import javafx.stage.Stage;
 
 public class OperationUnit {
 //	int ttlPeriod;
@@ -32,8 +31,7 @@ public class OperationUnit {
 		}
 		switch (operation) {
 		case ADD:
-		case LOAD:
-		case STORE:
+		case MEM:
 			used = new boolean[2];
 			break;
 		case MULT:
@@ -91,8 +89,7 @@ public class OperationUnit {
 	private ReserStation chooseStation() {
 		switch (operation) 
 		{
-			case LOAD:
-			case STORE:
+			case MEM:
 				/*
 				for(ReserStation st : stations)
 				{
@@ -289,31 +286,23 @@ public class OperationUnit {
 				}
 			}
 			break;
-		case LOAD:
+		case MEM:
 			if(stations != null) {
 				for(ReserStation st : stations) {
 					res += st.getName() + "\t";
-					if(st.isBusy()) {
-						res += "yes\t";
-						res += st.a + "\n";
+					if(!st.isBusy()) {	// then st.op might be null
+						res += "no\t \t \t \n";
 					} else {
-						res += "no\t \n";
+						res += "yes\t" + st.op + "\t" + st.a + "\t";
+						if(st.op == OP.ST) {
+							res += (st.qk == null ? st.vk : st.qk.getName()) + "\n";
+						} else {
+							res += " \n";
+						}
 					}
 				}
 			}
 			break;
-		case STORE:
-			if(stations != null) {
-				for(ReserStation st : stations) {
-					res += st.getName() + "\t";
-					if(st.isBusy()) {
-						res += "yes\t" + st.a + "\t";
-						res += (st.qk == null ? st.vk : st.qk.getName()) + "\n";
-					} else {
-						res += "no\t \t \n";
-					}
-				}
-			}
 		}
 		return res;
 	}
