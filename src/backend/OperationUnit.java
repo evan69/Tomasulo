@@ -276,7 +276,7 @@ public class OperationUnit {
 				for(ReserStation st : stations) {
 					res += st.getName() + "\t";
 					res += st.isBusy() ? "yes\t" : "no\t";
-					res += st.op.toString() + "\t";
+					res += st.op == null ? "--" :st.op.toString() + "\t";
 					res += (st.qj == null ? " " : st.qj.getName()) + "\t";
 					res += (st.qk == null ? " " : st.qk.getName()) + "\t";
 					res += (st.qj == null ? st.vj : " ") + "\t";
