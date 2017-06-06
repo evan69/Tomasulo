@@ -36,7 +36,7 @@ public class ReserStation {
 	public void issueIn(Instruction inst) {
 		// handle source registers
 		this.op = inst.op;
-		if(inst.op == OP.LD || inst.op == OP.ST) { // memory related
+		if(inst.op == OP.ST) { // memory related
 			// fix : 对于store指令，除了立即数应该还有一个源寄存器，按照书上来说应该是Qk
 			this.stages = OperationUnit.MEM_STAGES;
 			if (qi.isRegToWrite(inst.operand1)) {
@@ -47,7 +47,11 @@ public class ReserStation {
 			}
 			// fixed see above
 			a = inst.immidate;
-		} else {// registers only
+		} else if(inst.op == OP.LD) {
+			this.stages = OperationUnit.MEM_STAGES;
+			a = inst.immidate;
+		}
+		else {// registers only
 			doOperand(inst.operand1, inst.operand2);
 			switch (op) {
 			case ADDD:
