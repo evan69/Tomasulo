@@ -60,7 +60,7 @@ public class Main extends JFrame implements ActionListener {
 	/*
 	 * 执行一步，重置，开始
 	 */
-	private JButton stepbut, resetbut, startbut, lookupbut, savebut, stepnbut;
+	private JButton stepbut, resetbut, startbut, lookupbut, savebut, stepnbut, regsavebut;
 	private JPanel panel_but;
 	private JTextField memaddr, command_numbers; 
 	private JLabel cmdl;
@@ -333,6 +333,8 @@ public class Main extends JFrame implements ActionListener {
 		stepnbut = new JButton("自动执行");
 		stepnbut.addActionListener(this);
 		stepnbut.setEnabled(false);
+		regsavebut = new JButton("寄存器保存");
+		regsavebut.addActionListener(this);
 		
 		panel_but.add(cmdl);
 		panel_but.add(command_numbers);
@@ -343,6 +345,7 @@ public class Main extends JFrame implements ActionListener {
 		panel_but.add(lookupbut);
 		panel_but.add(memaddr);
 		panel_but.add(savebut);
+		panel_but.add(regsavebut);
 		//-----------------------------------------算法区域------------------------------------------	
 		cmdn = 10;
 		window_init();
@@ -565,6 +568,49 @@ public class Main extends JFrame implements ActionListener {
 		//-----------------------------------------重置按钮------------------------------------------	
 		actionReset(e);
 
+		//-----------------------------------------内存按钮------------------------------------------	
+		actionLookup(e);
+		actionMemSave(e);
+		
+	}
+
+
+
+
+	private void actionMemSave(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getSource() == savebut){
+			int pos = Integer.valueOf( memaddr.getText());
+			if (pos<0 || pos>4091){
+				pos=0;
+				memaddr.setText(Integer.toString(pos));
+				return;
+			}
+			for (int i = 1; i<6; i++){				
+				System.out.println(inst_memt[1][i].getText());
+				inst_meml[0][i].setText(Integer.toString(pos + i - 1));
+				fpu.memory[pos + i - 1] = Float.valueOf(inst_memt[1][i].getText());				
+			}
+		}
+	}
+
+
+
+
+	private void actionLookup(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getSource() == lookupbut){
+			int pos = Integer.valueOf( memaddr.getText());
+			if (pos<0 || pos>4091)
+				pos=0;
+			memaddr.setText(Integer.toString(pos));
+			
+			for (int i = 1; i<6; i++){
+				inst_meml[0][i].setText(Integer.toString(pos + i - 1));
+				inst_memt[1][i].setText(Float.toString(fpu.memory[pos + i - 1]));				
+				System.out.println(inst_memt[1][i].getText());
+			}
+		}
 	}
 
 
@@ -615,6 +661,7 @@ public class Main extends JFrame implements ActionListener {
 			startbut.setEnabled(true);
 			startbut.setEnabled(true);
 			savebut.setEnabled(true);
+			regsavebut.setEnabled(true);
 			lookupbut.setEnabled(true);
 			stepbut.setEnabled(false);
 			stepnbut.setEnabled(false);
@@ -637,6 +684,7 @@ public class Main extends JFrame implements ActionListener {
 			stepnbut.setEnabled(true);
 			startbut.setEnabled(false);
 			savebut.setEnabled(false);
+			regsavebut.setEnabled(false);
 			lookupbut.setEnabled(false);
 			for (int i = 1; i<12; i++)
 				inst_regt[2][i].setEditable(false);
@@ -647,12 +695,6 @@ public class Main extends JFrame implements ActionListener {
 			preparest();
 			// 展示其他面板
 			display();
-/*			cdtp.setVisible(true);
-			loadp.setVisible(true);
-			storep.setVisible(true);
-			rsvp.setVisible(true);
-			regp.setVisible(true);
-			memp.setVisible(true);*/
 		}
 		
 	}
