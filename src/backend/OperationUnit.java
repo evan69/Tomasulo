@@ -275,12 +275,16 @@ public class OperationUnit {
 			if(stations != null) {
 				for(ReserStation st : stations) {
 					res += st.getName() + "\t";
-					res += st.isBusy() ? "yes\t" : "no\t";
-					res += (st.op == null ? "--" :st.op.toString()) + "\t";
-					res += (st.qj == null ? " " : st.qj.getName()) + "\t";
-					res += (st.qk == null ? " " : st.qk.getName()) + "\t";
-					res += (st.qj == null ? st.vj : " ") + "\t";
-					res += (st.qj == null ? st.vk : " ") + "\n";
+					if(st.isBusy()) {
+						res += "yes\t";
+						res += st.op == null ? "--" :st.op.toString() + "\t";
+						res += (st.qj == null ? " " : st.qj.getName()) + "\t";
+						res += (st.qk == null ? " " : st.qk.getName()) + "\t";
+						res += (st.qj == null ? st.vj : " ") + "\t";
+						res += (st.qj == null ? st.vk : " ") + "\n";
+					} else {
+						res += "no\t \t \t \t \t \n";
+					}
 				}
 			}
 			break;
@@ -288,17 +292,25 @@ public class OperationUnit {
 			if(stations != null) {
 				for(ReserStation st : stations) {
 					res += st.getName() + "\t";
-					res += st.isBusy() ? "yes\t" : "no\t";
-					res += st.a + "\t \n";
+					if(st.isBusy()) {
+						res += "yes\t";
+						res += st.a + "\n";
+					} else {
+						res += "no\t \n";
+					}
 				}
 			}
+			break;
 		case STORE:
 			if(stations != null) {
 				for(ReserStation st : stations) {
 					res += st.getName() + "\t";
-					res += st.isBusy() ? "yes\t" : "no\t";
-					res += st.a + "\t";
-					res += (st.qk == null ? st.vk : st.qk.getName()) + "\n";
+					if(st.isBusy()) {
+						res += "yes\t" + st.a + "\t";
+						res += (st.qk == null ? st.vk : st.qk.getName()) + "\n";
+					} else {
+						res += "no\t \t \n";
+					}
 				}
 			}
 		}

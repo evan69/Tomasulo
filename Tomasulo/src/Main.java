@@ -482,9 +482,15 @@ public class Main extends JFrame implements ActionListener {
 		inst_regst[0][0] = "×Ö¶Î";
 		inst_regst[1][0] = "×´Ì¬";
 		inst_regst[2][0] = "Öµ";
+		String[] regs = fpu.getRegInfo().split("\n");
 		for (int i = 1; i < 12; i++) {
 			inst_regst[0][i] = fx[i - 1];
+			String[] row = regs[i-1].split("\t");
+			inst_regst[1][i] = row[2];
+			inst_regst[2][i] = row[1];
+			
 		}
+		
 		
 		inst_memst[0][0] = "µØÖ·";
 		inst_memst[1][0] = "Öµ";
@@ -572,6 +578,24 @@ public class Main extends JFrame implements ActionListener {
 		actionLookup(e);
 		actionMemSave(e);
 		
+		//-----------------------------------------¼Ä´æÆ÷°´Å¥------------------------------------------
+		actionRegsave(e);
+	}
+
+
+
+
+	private void actionRegsave(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getSource() == regsavebut){
+			for (int i = 0; i<11; i++){
+				inst_regst[2][i+1] = inst_regt[2][i+1].getText();
+				float v = Float.valueOf(inst_regt[2][i+1].getText());
+				
+				fpu.setReg(i, v);
+			}
+			display();
+		}
 	}
 
 
@@ -587,10 +611,12 @@ public class Main extends JFrame implements ActionListener {
 				return;
 			}
 			for (int i = 1; i<6; i++){				
-				System.out.println(inst_memt[1][i].getText());
-				inst_meml[0][i].setText(Integer.toString(pos + i - 1));
+				
+				inst_memst[0][i] = Integer.toString(pos + i - 1);
+				inst_memst[1][i] = inst_memt[1][i].getText();
 				fpu.memory[pos + i - 1] = Float.valueOf(inst_memt[1][i].getText());				
 			}
+			display();
 		}
 	}
 
@@ -606,10 +632,13 @@ public class Main extends JFrame implements ActionListener {
 			memaddr.setText(Integer.toString(pos));
 			
 			for (int i = 1; i<6; i++){
-				inst_meml[0][i].setText(Integer.toString(pos + i - 1));
-				inst_memt[1][i].setText(Float.toString(fpu.memory[pos + i - 1]));				
-				System.out.println(inst_memt[1][i].getText());
+//				inst_meml[0][i].setText(Integer.toString(pos + i - 1));
+//				inst_memt[1][i].setText(Float.toString(fpu.memory[pos + i - 1]));				
+				inst_memst[0][i]=Integer.toString(pos + i - 1);
+				inst_memst[1][i]=Float.toString(fpu.memory[pos + i - 1]);				
+				
 			}
+			display();
 		}
 	}
 
@@ -736,7 +765,13 @@ public class Main extends JFrame implements ActionListener {
 				inst_storest[r][3] = row[3];
 			}
 	
-		
+			String[] regs = fpu.getRegInfo().split("\n");
+			for (int i = 1; i < 12; i++) {
+				String[] row = regs[i-1].split("\t");
+				inst_regst[1][i] = row[2];
+				inst_regst[2][i] = row[1];
+				
+			}
 		display();
 		}
 	}
