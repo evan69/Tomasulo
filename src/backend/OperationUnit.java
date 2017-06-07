@@ -152,6 +152,7 @@ public class OperationUnit {
 				//正在执行
 				if(st.currentTime > 0) {
 					--st.currentTime;
+					++st.inst.executation;
 				}
 				if(st.currentTime == 0) {	// finished this stage
 					if(st.stage < st.stages.length - 1 && !used[st.stage + 1]) {
@@ -163,10 +164,6 @@ public class OperationUnit {
 						used[st.stage] = false;
 						++st.stage;	// execution finished
 					}
-//					++st.stage;
-//					if(st.stage < st.stages.length) {
-//						st.currentTime = st.stages[st.stage];
-//					}
 				}
 			}
 		}
@@ -218,6 +215,8 @@ public class OperationUnit {
 			//System.out.println(st);
 			if(st.stage < st.stages.length)	// execution not finished
 				continue;
+			// we are sure that the instruction has finished executation and will be written back
+			st.inst.writtenBack = true;
 			if(st.op != OP.ST) {
 				//不是store指令
 				CDB cdb = CDB.getInstance();
@@ -245,12 +244,14 @@ public class OperationUnit {
 					//lo++;
 					//lo = (lo + 1) % stations.length;
 					removeHead();
+				} else {
+					assert false;
 				}
 			}
 		}
 		
 	}
-	
+
 	public boolean issueInstruction(Instruction curr) {
 		if(operation == UnitType.ADD || operation == UnitType.MULT) {
 			for(ReserStation station: stations) {
