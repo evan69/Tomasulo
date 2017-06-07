@@ -26,8 +26,10 @@ hs_err_pid*
 .classpath
 .project
 .settings/
+
 Tomasulo/
 .metadata/
 .recommenders/
 RemoteSystemsTempFiles
+
 

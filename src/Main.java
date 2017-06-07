@@ -599,8 +599,9 @@ public class Main extends JFrame implements ActionListener {
 		//-----------------------------------------开始按钮------------------------------------------	
 		actionStart(e);
 		
-		//-----------------------------------------执行一步------------------------------------------
+		//-----------------------------------------执行------------------------------------------
 		actionStep(e);
+		actionStepN(e);
 		
 		//-----------------------------------------重置按钮------------------------------------------	
 		actionReset(e);
@@ -614,6 +615,7 @@ public class Main extends JFrame implements ActionListener {
 		
 		//-----------------------------------------导入按钮------------------------------------------
 		actionFile(e);
+		
 	}
 
 
@@ -788,7 +790,7 @@ public class Main extends JFrame implements ActionListener {
 		startbut.setEnabled(true);
 		savebut.setEnabled(true);
 		regsavebut.setEnabled(true);
-		lookupbut.setEnabled(true);
+		
 		filebut.setEnabled(true);
 		stepbut.setEnabled(false);
 		stepnbut.setEnabled(false);
@@ -800,6 +802,7 @@ public class Main extends JFrame implements ActionListener {
 		// TODO Auto-generated method stub
 		if (e.getSource() ==resetbut) {
 			reset_cmd();
+			fpu.reset();
 		}
 	}
 
@@ -818,7 +821,7 @@ public class Main extends JFrame implements ActionListener {
 			startbut.setEnabled(false);
 			savebut.setEnabled(false);
 			regsavebut.setEnabled(false);
-			lookupbut.setEnabled(false);
+			
 			filebut.setEnabled(false);
 			for (int i = 1; i<12; i++)
 				inst_regt[2][i].setEditable(false);
@@ -833,88 +836,124 @@ public class Main extends JFrame implements ActionListener {
 		
 	}
 	
+	private void actionStepN(ActionEvent e){
+		if (e.getSource() == stepnbut){
+			Thread thread = new Thread(new Runnable() {
+				public void run() {
+					while (! fpu.finishExcute()){
+						fpu.update();
+						Tn++;
+						update();
+						display();
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}		
+					}
+				}
+			});
+			thread.start();
+			/*while (! fpu.finishExcute()){
+				fpu.update();
+				Tn++;
+				update();
+				display();
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}		
+			}*/
+		}
+	}
 	
+	private void update(){
+		String[] res = fpu.showReserStations().split("\n");
+		
+		int r = 1;
+		for (int i = 0; i<6; i++, r++){
+			String[] row = res[i].split("\t");
+			while (row.length < 7){
+				i++;
+				row = res[i].split("\t");
+			}
+			
+			inst_rsvst[r][2] = row[1];
+			inst_rsvst[r][3] = row[2];
+			inst_rsvst[r][4] = row[3];
+			inst_rsvst[r][5] = row[4];
+			inst_rsvst[r][6] = row[5];
+			inst_rsvst[r][7] = row[6];				
+		}
+		
 	
+		int rl = 1, rs = 1;
+		for (int i = 6; i<13; i++){
+			String[] row = res[i].split("\t");
+			while (row.length < 5){
+				i++;
+				row = res[i].split("\t");
+			}
+		
+			if (row[2].equals("ST")){
+				inst_storest[rs][1] = row[1];
+				inst_storest[rs][2] = row[3];
+				inst_storest[rs][3] = row[4];
+				rs++;
+			}
+			else{
+				inst_loadst[rl][1] = row[1];
+				inst_loadst[rl][2] = row[3];
+				inst_loadst[rl][3] = row[4];
+				rl++;
+			}
+		}
+		
+		
+		String[] regs = fpu.getRegInfo().split("\n");
+		for (int i = 1; i < 12; i++) {
+			String[] row = regs[i-1].split("\t");
+			inst_regst[1][i] = row[2];
+			inst_regst[2][i] = row[1];
+			
+		}
+		
+		for (int i = 0; i<5; i++)
+			inst_memst[1][1+i] = Float.toString(fpu.getMem(i+mempos));
+					
+		r=1;
+		for (int i = 0,j=allinst.size(); i<j;i++,r++){
+			int v = allinst.get(i).getInstStatus();
+			if (v == -1){
+				inst_cdtst[r][1] = "";
+				inst_cdtst[r][2] = "";
+				inst_cdtst[r][3] = "";
+			}
+			else if (v >= 0){
+				inst_cdtst[r][1] = "OK";
+				inst_cdtst[r][2] = Integer.toString(v);
+				inst_cdtst[r][3] = "";
+			}
+			else if (v == -2){
+				inst_cdtst[r][1] = "OK";
+				inst_cdtst[r][2] = "OK";
+				inst_cdtst[r][3] = "OK";
+			}
+		}
+		
+	}
+
 	private void actionStep(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() == stepbut){
 			System.out.println("enter actstep");
 			fpu.update();
 			Tn++;
-			String[] res = fpu.showReserStations().split("\n");
-	
-			int r = 1;
-			for (int i = 0; i<6; i++, r++){
-				String[] row = res[i].split("\t");
-				while (row.length < 7){
-					i++;
-					row = res[i].split("\t");
-				}
-				
-				inst_rsvst[r][2] = row[1];
-				inst_rsvst[r][3] = row[2];
-				inst_rsvst[r][4] = row[3];
-				inst_rsvst[r][5] = row[4];
-				inst_rsvst[r][6] = row[5];
-				inst_rsvst[r][7] = row[6];				
-			}
 			
-		
-			int rl = 1, rs = 1;
-			for (int i = 6; i<13; i++){
-				String[] row = res[i].split("\t");
-				while (row.length < 5){
-					i++;
-					row = res[i].split("\t");
-				}
-			
-				if (row[2].equals("ST")){
-					inst_storest[rs][1] = row[1];
-					inst_storest[rs][2] = row[3];
-					inst_storest[rs][3] = row[4];
-					rs++;
-				}
-				else{
-					inst_loadst[rl][1] = row[1];
-					inst_loadst[rl][2] = row[3];
-					inst_loadst[rl][3] = row[4];
-					rl++;
-				}
-			}
-			
-			
-			String[] regs = fpu.getRegInfo().split("\n");
-			for (int i = 1; i < 12; i++) {
-				String[] row = regs[i-1].split("\t");
-				inst_regst[1][i] = row[2];
-				inst_regst[2][i] = row[1];
-				
-			}
-			
-			for (int i = 0; i<5; i++)
-				inst_memst[1][1+i] = Float.toString(fpu.getMem(i+mempos));
-						
-			r=1;
-			for (int i = 0,j=allinst.size(); i<j;i++,r++){
-				int v = allinst.get(i).getInstStatus();
-				if (v == -1){
-					inst_cdtst[r][1] = "";
-					inst_cdtst[r][2] = "";
-					inst_cdtst[r][3] = "";
-				}
-				else if (v >= 0){
-					inst_cdtst[r][1] = "OK";
-					inst_cdtst[r][2] = Integer.toString(v);
-					inst_cdtst[r][3] = "";
-				}
-				else if (v == -1){
-					inst_cdtst[r][1] = "OK";
-					inst_cdtst[r][2] = "OK";
-					inst_cdtst[r][3] = "OK";
-				}
-			}
-			
-			
+			update();
 			display();
 		}
 	}

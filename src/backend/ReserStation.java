@@ -1,3 +1,4 @@
+﻿
 package backend;
 
 import backend.FloatPointUnit.OP;
@@ -38,7 +39,11 @@ public class ReserStation {
 		// handle source registers
 		this.op = inst.op;
 		if(inst.op == OP.ST) { // memory related
+<<<<<<< HEAD:src/backend/ReserStation.java
 			// fix : 对于store指令，除了立即数应该还有一个源寄存器，按照书上来说应该是Qk
+=======
+			// fix : 瀵逛簬store鎸囦护锛岄櫎浜嗙珛鍗虫暟搴旇杩樻湁涓�涓簮瀵勫瓨鍣紝鎸夌収涔︿笂鏉ヨ搴旇鏄疩k
+>>>>>>> comb:Tomasulo/src/backend/ReserStation.java
 			this.stages = OperationUnit.MEM_STAGES;
 			if (!qi.isRegToWrite(inst.operand1)) {
 				vk = qi.getRegValue(inst.operand1);
@@ -73,7 +78,11 @@ public class ReserStation {
 			qi.setSourceStation(inst.target, this);
 		}
 		this.busy = true;
+<<<<<<< HEAD:src/backend/ReserStation.java
 		// 需要修改为busy
+=======
+		// 闇�瑕佷慨鏀逛负busy
+>>>>>>> comb:Tomasulo/src/backend/ReserStation.java
 		this.isExcuting = false;
 		inst.issued = true;
 		this.inst = inst;
@@ -114,3 +123,4 @@ public class ReserStation {
 	}
 
 }
+
