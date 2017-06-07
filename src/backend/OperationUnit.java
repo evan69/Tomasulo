@@ -226,7 +226,7 @@ public class OperationUnit {
 				st.busy = false;
 				//System.out.println(stations[0]);
 				//System.out.println(st);
-				assert st == stations[0];
+//				assert st == stations[0];
 				if(st.op == OP.LD) {
 					//lo++;
 					//lo = (lo + 1) % stations.length;
