@@ -3,7 +3,7 @@ package backend;
 import backend.FloatPointUnit.OP;
 
 public class ReserStation {
-	private String name; // sth like MULT1, ADD1
+	public String name; // sth like MULT1, ADD1
 	public boolean busy = false;
 	public ReserStation qj, qk;
 	public RegStates qi;
@@ -39,7 +39,7 @@ public class ReserStation {
 		if(inst.op == OP.ST) { // memory related
 			// fix : 对于store指令，除了立即数应该还有一个源寄存器，按照书上来说应该是Qk
 			this.stages = OperationUnit.MEM_STAGES;
-			if (qi.isRegToWrite(inst.operand1)) {
+			if (!qi.isRegToWrite(inst.operand1)) {
 				vk = qi.getRegValue(inst.operand1);
 				qk = null;
 			} else {
@@ -107,7 +107,7 @@ public class ReserStation {
 		}
 		return getName() + "\t busy: " + busy + 
 				"\t gonna excuting: " + (isExcuting ?("period " + currentTime + " of stage " + stage): "false") +
-				"\t" + info;
+				"\t" + info + "\tOP:" + this.op + "\t" + this.vj + "\t" + this.vk;
 	}
 
 }
