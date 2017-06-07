@@ -43,6 +43,7 @@ public class CDB {
 		this.result = result;
 		broadcast2OperUnit(fpu.addUnit);
 		broadcast2OperUnit(fpu.multUnit);
+		broadcast2OperUnit(fpu.memUnit);
 		RegStates rs = RegStates.getInstance();
 		for(int i = 0; i < RegStates.REG_NUM; ++i) {
 			if(broadcaster.equals(rs.getSourceStation(i))) {

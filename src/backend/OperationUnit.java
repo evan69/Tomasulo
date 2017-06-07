@@ -107,6 +107,8 @@ public class OperationUnit {
 					break;
 				if(stations[0].isExcuting)
 					break;
+				if(stations[0].op == OP.ST && stations[0].qk != null)
+					break;
 				return stations[0];
 				// TODO : 需要将访存部件保留站修改为队列结构，获取头部
 			case ADD:
