@@ -12,9 +12,12 @@ import java.awt.event.ItemListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -60,9 +63,10 @@ public class Main extends JFrame implements ActionListener {
 	/*
 	 * 执行一步，重置，开始
 	 */
-	private JButton stepbut, resetbut, startbut, lookupbut, savebut, stepnbut, regsavebut;
+	private JButton stepbut, resetbut, startbut, lookupbut, savebut, stepnbut, regsavebut, filebut;
 	private JPanel panel_but;
 	private JTextField memaddr, command_numbers; 
+	private JFileChooser fileChooser;
 	private JLabel cmdl;
 	
 	//-----------------------------------------运行状态------------------------------------------	
@@ -166,13 +170,13 @@ public class Main extends JFrame implements ActionListener {
 		loadl = new JLabel("Load Queue");
 		loadl.setPreferredSize(new Dimension(label_w, 30));
 		loadp.add(loadl);
-		panel_load = new JPanel(new GridLayout(4, 4, 0, 0));
+		panel_load = new JPanel(new GridLayout(7, 4, 0, 0));
 		panel_load.setPreferredSize(new Dimension(ls_w, ls_h-40));// 200,100
 		panel_load.setBorder(new EtchedBorder(EtchedBorder.RAISED));
 		loadp.add(panel_load);
-		inst_loadl = new JLabel[4][4];
-		inst_loadst = new String[4][4];
-		for (int i = 0; i < 4; i++) {
+		inst_loadl = new JLabel[7][4];
+		inst_loadst = new String[7][4];
+		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 4; j++) {
 				inst_loadl[i][j] = new JLabel(inst_loadst[i][j]);
 				inst_loadl[i][j].setBorder(new EtchedBorder(EtchedBorder.RAISED));
@@ -187,13 +191,13 @@ public class Main extends JFrame implements ActionListener {
 		storel = new JLabel("Store Queue");
 		storel.setPreferredSize(new Dimension(label_w, 30));
 		storep.add(storel);
-		panel_store = new JPanel(new GridLayout(4, 4, 0, 0));
+		panel_store = new JPanel(new GridLayout(7, 4, 0, 0));
 		panel_store.setPreferredSize(new Dimension(ls_w, ls_h-40));// 200,100
 		panel_store.setBorder(new EtchedBorder(EtchedBorder.RAISED));
 		storep.add(panel_store);
-		inst_storel = new JLabel[4][4];
-		inst_storest = new String[4][4];
-		for (int i = 0; i < 4; i++) {
+		inst_storel = new JLabel[7][4];
+		inst_storest = new String[7][4];
+		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 4; j++) {
 				inst_storel[i][j] = new JLabel(inst_storest[i][j]);
 				inst_storel[i][j].setBorder(new EtchedBorder(EtchedBorder.RAISED));
@@ -335,17 +339,22 @@ public class Main extends JFrame implements ActionListener {
 		stepnbut.setEnabled(false);
 		regsavebut = new JButton("寄存器保存");
 		regsavebut.addActionListener(this);
+		filebut = new JButton("文件导入");
+		filebut.addActionListener(this);
+		
 		
 		panel_but.add(cmdl);
 		panel_but.add(command_numbers);
+		panel_but.add(resetbut);
+		panel_but.add(filebut);
 		panel_but.add(startbut);
 		panel_but.add(stepbut);
 		panel_but.add(stepnbut);
-		panel_but.add(resetbut);
 		panel_but.add(lookupbut);
 		panel_but.add(memaddr);
 		panel_but.add(savebut);
 		panel_but.add(regsavebut);
+		
 		//-----------------------------------------算法区域------------------------------------------	
 		cmdn = 10;
 		window_init();
@@ -404,11 +413,11 @@ public class Main extends JFrame implements ActionListener {
 			for (int j = 0; j < 4; j++) {
 				inst_cdtl[i][j].setText(inst_cdtst[i][j]);
 			}
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 7; i++)
 			for (int j = 0; j < 4; j++) {
 				inst_loadl[i][j].setText(inst_loadst[i][j]);
 			}
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 7; i++)
 			for (int j = 0; j < 4; j++) {
 				inst_storel[i][j].setText(inst_storest[i][j]);
 			}
@@ -445,9 +454,15 @@ public class Main extends JFrame implements ActionListener {
 		inst_loadst[1][0] = "Load1";
 		inst_loadst[2][0] = "Load2";
 		inst_loadst[3][0] = "Load3";
+		inst_loadst[4][0] = "Load4";
+		inst_loadst[5][0] = "Load5";
+		inst_loadst[6][0] = "Load6";
 		inst_loadst[1][1] = "no";
 		inst_loadst[2][1] = "no";
 		inst_loadst[3][1] = "no";
+		inst_loadst[4][1] = "no";
+		inst_loadst[5][1] = "no";
+		inst_loadst[6][1] = "no";
 		
 		inst_storest[0][0] = "名称";
 		inst_storest[0][1] = "Busy";
@@ -456,9 +471,16 @@ public class Main extends JFrame implements ActionListener {
 		inst_storest[1][0] = "Store1";
 		inst_storest[2][0] = "Store2";
 		inst_storest[3][0] = "Store3";
+		inst_storest[4][0] = "Store4";
+		inst_storest[5][0] = "Store5";
+		inst_storest[6][0] = "Store6";
 		inst_storest[1][1] = "no";
 		inst_storest[2][1] = "no";
 		inst_storest[3][1] = "no";
+		inst_storest[4][1] = "no";
+		inst_storest[5][1] = "no";
+		inst_storest[6][1] = "no";
+		
 		
 		inst_rsvst[0][0] = "Time";
 		inst_rsvst[0][1] = "名称";
@@ -468,11 +490,11 @@ public class Main extends JFrame implements ActionListener {
 		inst_rsvst[0][5] = "Qk";
 		inst_rsvst[0][6] = "Vj";
 		inst_rsvst[0][7] = "Vk";
-		inst_rsvst[1][1] = "Add1";
-		inst_rsvst[2][1] = "Add2";
-		inst_rsvst[3][1] = "Add3";
-		inst_rsvst[4][1] = "Mult1";
-		inst_rsvst[5][1] = "Mult2";
+		inst_rsvst[1][1] = "Add0";
+		inst_rsvst[2][1] = "Add1";
+		inst_rsvst[3][1] = "Add2";
+		inst_rsvst[4][1] = "Mult0";
+		inst_rsvst[5][1] = "Mult1";
 		inst_rsvst[1][2] = "no";
 		inst_rsvst[2][2] = "no";
 		inst_rsvst[3][2] = "no";
@@ -580,6 +602,81 @@ public class Main extends JFrame implements ActionListener {
 		
 		//-----------------------------------------寄存器按钮------------------------------------------
 		actionRegsave(e);
+		
+		//-----------------------------------------导入按钮------------------------------------------
+		actionFile(e);
+	}
+
+
+
+
+	private void actionFile(ActionEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getSource() == filebut){
+			fileChooser = new JFileChooser();
+			int selected = fileChooser.showOpenDialog(getContentPane());
+			if (selected == JFileChooser.APPROVE_OPTION){
+				File file = fileChooser.getSelectedFile();
+				try {
+					BufferedReader reader = new BufferedReader(new FileReader(file));
+					String row = null;
+					ArrayList<String> rows = new ArrayList<String>();
+					while ((row = reader.readLine()) != null){
+						System.out.println(row);
+						rows.add(row);
+					}
+					cmdn = rows.size();
+					command_numbers.setText(Integer.toString(cmdn));
+					reset_cmd();
+					int p = 0;
+					for (int i = 0; i<cmdn; i++, p+=4){
+						for (int j = 0; j < 4; j++)
+							instbox[p+j].removeAllItems();
+						String[] line = rows.get(i).split(" ");
+						for (int j = 0; j<line.length; j++){
+							boolean flag = false;
+							for (int k = 0; k<inst.length;k++)
+								if (line[j].equals(inst[k])){
+									for (int kk = 0; kk < inst.length; kk++)
+										instbox[p+j].addItem(inst[kk]);
+									
+									instbox[p+j].setSelectedIndex(k);
+									flag = true;
+									break;
+								}
+							if (flag)
+								continue;
+							for (int k = 0; k<fx.length;k++)
+								if (line[j].equals(fx[k])){
+									
+									for (int kk = 0; kk < fx.length; kk++)
+										instbox[p+j].addItem(fx[kk]);
+									
+									instbox[p+j].setSelectedIndex(k);
+									flag = true;
+									break;
+								}
+							if (flag)
+								continue;
+							for (int k = 0; k<ix.length;k++)
+								if (line[j].equals(ix[k])){
+									
+									for (int kk = 0; kk < ix.length; kk++)
+										instbox[p+j].addItem(ix[kk]);
+									
+									instbox[p+j].setSelectedIndex(k);
+									flag = true;
+									break;
+								}
+						}
+					}
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+			}
+		}
 	}
 
 
@@ -681,21 +778,24 @@ public class Main extends JFrame implements ActionListener {
 		}// for
 	}
 	
-
+	void reset_cmd(){
+		cmdn = Integer.valueOf(command_numbers.getText());
+		startbut.setEnabled(true);
+		startbut.setEnabled(true);
+		savebut.setEnabled(true);
+		regsavebut.setEnabled(true);
+		lookupbut.setEnabled(true);
+		filebut.setEnabled(true);
+		stepbut.setEnabled(false);
+		stepnbut.setEnabled(false);
+		window_clear();
+		window_init();
+	}
 
 	private void actionReset(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() ==resetbut) {
-			cmdn = Integer.valueOf(command_numbers.getText());
-			startbut.setEnabled(true);
-			startbut.setEnabled(true);
-			savebut.setEnabled(true);
-			regsavebut.setEnabled(true);
-			lookupbut.setEnabled(true);
-			stepbut.setEnabled(false);
-			stepnbut.setEnabled(false);
-			window_clear();
-			window_init();
+			reset_cmd();
 		}
 	}
 
@@ -715,6 +815,7 @@ public class Main extends JFrame implements ActionListener {
 			savebut.setEnabled(false);
 			regsavebut.setEnabled(false);
 			lookupbut.setEnabled(false);
+			filebut.setEnabled(false);
 			for (int i = 1; i<12; i++)
 				inst_regt[2][i].setEditable(false);
 			for (int i = 1; i<6; i++)
@@ -735,10 +836,17 @@ public class Main extends JFrame implements ActionListener {
 		if (e.getSource() == stepbut){
 			System.out.println("enter actstep");
 			fpu.update();
+			
 			String[] res = fpu.showReserStations().split("\n");
+	
 			int r = 1;
-			for (int i = 0; i<5; i++, r++){
+			for (int i = 0; i<6; i++, r++){
 				String[] row = res[i].split("\t");
+				while (row.length < 7){
+					i++;
+					row = res[i].split("\t");
+				}
+				
 				inst_rsvst[r][2] = row[1];
 				inst_rsvst[r][3] = row[2];
 				inst_rsvst[r][4] = row[3];
@@ -746,25 +854,31 @@ public class Main extends JFrame implements ActionListener {
 				inst_rsvst[r][6] = row[5];
 				inst_rsvst[r][7] = row[6];				
 			}
-			r = 1;
-			for (int i = 5; i<8; i++,r++){
+			
+		
+			int rl = 1, rs = 1;
+			for (int i = 6; i<13; i++){
 				String[] row = res[i].split("\t");
-				
-
-				inst_loadst[r][1] = row[1];
-				inst_loadst[r][2] = row[2];
-				inst_loadst[r][3] = row[3];
+				while (row.length < 5){
+					i++;
+					row = res[i].split("\t");
+				}
+			
+				if (row[2].equals("ST")){
+					inst_storest[rs][1] = row[1];
+					inst_storest[rs][2] = row[3];
+					inst_storest[rs][3] = row[4];
+					rs++;
+				}
+				else{
+					inst_loadst[rl][1] = row[1];
+					inst_loadst[rl][2] = row[3];
+					inst_loadst[rl][3] = row[4];
+					rl++;
+				}
 			}
-			r = 1;
-			for (int i = 8; i<11; i++,r++){
-				String[] row = res[i].split("\t");
-				
-
-				inst_storest[r][1] = row[1];
-				inst_storest[r][2] = row[2];
-				inst_storest[r][3] = row[3];
-			}
-	
+			
+			
 			String[] regs = fpu.getRegInfo().split("\n");
 			for (int i = 1; i < 12; i++) {
 				String[] row = regs[i-1].split("\t");

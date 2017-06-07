@@ -1,8 +1,8 @@
+
 package backend;
 
 import backend.FloatPointUnit.OP;
 import backend.FloatPointUnit.UnitType;
-import javafx.stage.Stage;
 
 public class OperationUnit {
 //	int ttlPeriod;
@@ -32,8 +32,7 @@ public class OperationUnit {
 		}
 		switch (operation) {
 		case ADD:
-		case LOAD:
-		case STORE:
+		case MEM:
 			used = new boolean[2];
 			break;
 		case MULT:
@@ -91,8 +90,7 @@ public class OperationUnit {
 	private ReserStation chooseStation() {
 		switch (operation) 
 		{
-			case LOAD:
-			case STORE:
+			case MEM:
 				/*
 				for(ReserStation st : stations)
 				{
@@ -146,6 +144,7 @@ public class OperationUnit {
 						used[st.stage] = true;	// occupy the next stage
 						st.currentTime = st.stages[st.stage];
 					} else if(st.stage == st.stages.length - 1) {
+						used[st.stage] = false;
 						++st.stage;	// execution finished
 					}
 //					++st.stage;
@@ -201,7 +200,7 @@ public class OperationUnit {
 				continue;
 			}
 			if(st.stage < st.stages.length)	// execution not finished
-				return;
+				continue;
 			if(st.op != OP.ST) {
 				//不是store指令
 				CDB cdb = CDB.getInstance();
@@ -275,32 +274,36 @@ public class OperationUnit {
 			if(stations != null) {
 				for(ReserStation st : stations) {
 					res += st.getName() + "\t";
-					res += st.isBusy() ? "yes\t" : "no\t";
-					res += (st.op == null ? "--" :st.op.toString()) + "\t";
-					res += (st.qj == null ? " " : st.qj.getName()) + "\t";
-					res += (st.qk == null ? " " : st.qk.getName()) + "\t";
-					res += (st.qj == null ? st.vj : " ") + "\t";
-					res += (st.qj == null ? st.vk : " ") + "\n";
+					if(st.isBusy()) {
+						res += "yes\t";
+						res += st.op == null ? "--" :st.op.toString() + "\t";
+						res += (st.qj == null ? " " : st.qj.getName()) + "\t";
+						res += (st.qk == null ? " " : st.qk.getName()) + "\t";
+						res += (st.qj == null ? st.vj : " ") + "\t";
+						res += (st.qj == null ? st.vk : " ") + "\n";
+					} else {
+						res += "no\t \t \t \t \t \n";
+					}
 				}
 			}
 			break;
-		case LOAD:
+		case MEM:
 			if(stations != null) {
 				for(ReserStation st : stations) {
 					res += st.getName() + "\t";
-					res += st.isBusy() ? "yes\t" : "no\t";
-					res += st.a + "\t \n";
+					if(!st.isBusy()) {	// then st.op might be null
+						res += "no\t \t \t \n";
+					} else {
+						res += "yes\t" + st.op + "\t" + st.a + "\t";
+						if(st.op == OP.ST) {
+							res += (st.qk == null ? st.vk : st.qk.getName()) + "\n";
+						} else {
+							res += " \n";
+						}
+					}
 				}
 			}
-		case STORE:
-			if(stations != null) {
-				for(ReserStation st : stations) {
-					res += st.getName() + "\t";
-					res += st.isBusy() ? "yes\t" : "no\t";
-					res += st.a + "\t";
-					res += (st.qk == null ? st.vk : st.qk.getName()) + "\n";
-				}
-			}
+			break;
 		}
 		return res;
 	}
