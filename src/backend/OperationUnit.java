@@ -160,9 +160,11 @@ public class OperationUnit {
 						++st.stage;
 						used[st.stage] = true;	// occupy the next stage
 						st.currentTime = st.stages[st.stage];
+						st.inst.executation++;
 					} else if(st.stage == st.stages.length - 1) {
 						used[st.stage] = false;
 						++st.stage;	// execution finished
+						st.inst.executation++;
 					}
 				}
 			}
