@@ -28,7 +28,7 @@ public class FloatPointUnit {
 		System.out.println(addUnit);
 		System.out.println(multUnit);
 		System.out.println(memUnit);
-		System.out.println("\n\n\n");
+//		System.out.println("\n\n\n");
 	}
 	
 	public String showReserStations() {

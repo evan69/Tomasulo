@@ -3,6 +3,7 @@ package backend;
 import backend.FloatPointUnit.OP;
 
 public class ReserStation {
+	Instruction inst;
 	public String name; // sth like MULT1, ADD1
 	public boolean busy = false;
 	public ReserStation qj, qk;
@@ -74,6 +75,8 @@ public class ReserStation {
 		this.busy = true;
 		// 需要修改为busy
 		this.isExcuting = false;
+		inst.issued = true;
+		this.inst = inst;
 	}
 
 	public ReserStation(String name) {

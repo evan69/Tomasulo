@@ -68,6 +68,10 @@ public class Main {
 		//while(!cpu.finishExcute())
 			System.out.println("update " + i);
 			cpu.update();
+			for(Instruction ins: testInstr) {
+				System.out.println(ins.toString() + ins.getInstStatus());
+			}
+			System.out.println("\n\n\n");
 		}
 		System.out.println(RegStates.getInstance().toString());
 		cpu.reset();
@@ -78,7 +82,6 @@ public class Main {
 			cpu.addInstruction(testInstr[i]);
 		}
 		for(int i = 0; !cpu.finishExcute() ; i++) {
-		//while(!cpu.finishExcute())
 			System.out.println("update " + i);
 			cpu.update();
 		}
