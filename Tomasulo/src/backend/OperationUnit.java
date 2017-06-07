@@ -13,11 +13,12 @@ public class OperationUnit {
 	//float result;
 	public static final int[] MULT_STAGES = {1, 2, 2, 2, 2, 1};
 	public static final int[] DIV_STAGES = {40};
-	public static final int[] MEM_STAGES = {1, 1};
+	public static final int[] MEM_STAGES = {2};
 	public static final int[] ADD_STAGES = {1, 1};
 	private boolean[] used;
-	int hi = 0;
-	int lo = 0;
+	//int hi = 0;
+	//int lo = 0;
+	int max_used = 0;
 	// queue for LOAD / STORE
 	/**
 	 * @param stationNum is number of stations, like 2 for multiple/divide, 3 for load
@@ -41,6 +42,14 @@ public class OperationUnit {
 		default:
 			break;
 		}
+	}
+	
+	public boolean finishExcute() {
+		for(ReserStation st : stations) {
+			if(st.busy)
+				return false;
+		}
+		return true;
 	}
 	
 	//执行阶段被调用，获取计算结果（除store返回0不代表计算结果）
@@ -68,23 +77,25 @@ public class OperationUnit {
 		}
 	}
 
+	
 	//LOAD / STORE 检测队列是否满
 	public boolean checkFull() {
-		if(hi == lo && stations[lo].busy == true) {
-			//已经满了
-			return true;
-		}
-		return false;
+		return stations[stations.length-1].busy;
 	}
 	
-	//LOAD / STORE 检测队列是否空
-	public boolean checkEmpty() {
-		if(hi == lo && stations[lo].busy == false) {
-			//已经空了
-			return true;
+	private void removeHead() {
+		if(max_used == 0)
+			return;
+		for(int i = 0;i < stations.length - 1;i++) {
+			stations[i] = stations[i+1];
+			stations[i].name = "MEM" + new Integer(i).toString();
 		}
-		return false;
+		max_used--;
+		stations[stations.length-1] = new ReserStation("MEM" + new Integer(stations.length-1).toString());
+		stations[stations.length-1].isExcuting = false;
+		stations[stations.length-1].busy = false;
 	}
+	
 	
 	//选择一个保留站执行
 	private ReserStation chooseStation() {
@@ -99,10 +110,16 @@ public class OperationUnit {
 					return st;
 				}
 				*/
-				if(!checkEmpty())
-					return stations[lo];
+				//if(used[0])
+				assert (!stations[0].busy) == (max_used == 0);
+				if(!stations[0].busy)
+					break;
+				if(stations[0].isExcuting)
+					break;
+				if(stations[0].op == OP.ST && stations[0].qk != null)
+					break;
+				return stations[0];
 				// TODO : 需要将访存部件保留站修改为队列结构，获取头部
-				break;
 			case ADD:
 			case MULT:
 				if(isExcutingDivide() || used[0])
@@ -136,6 +153,7 @@ public class OperationUnit {
 				//正在执行
 				if(st.currentTime > 0) {
 					--st.currentTime;
+					++st.inst.executation;
 				}
 				if(st.currentTime == 0) {	// finished this stage
 					if(st.stage < st.stages.length - 1 && !used[st.stage + 1]) {
@@ -147,10 +165,6 @@ public class OperationUnit {
 						used[st.stage] = false;
 						++st.stage;	// execution finished
 					}
-//					++st.stage;
-//					if(st.stage < st.stages.length) {
-//						st.currentTime = st.stages[st.stage];
-//					}
 				}
 			}
 		}
@@ -199,8 +213,11 @@ public class OperationUnit {
 			if(!st.isBusy() || !st.isExcuting) {
 				continue;
 			}
+			//System.out.println(st);
 			if(st.stage < st.stages.length)	// execution not finished
 				continue;
+			// we are sure that the instruction has finished executation and will be written back
+			st.inst.writtenBack = true;
 			if(st.op != OP.ST) {
 				//不是store指令
 				CDB cdb = CDB.getInstance();
@@ -208,26 +225,34 @@ public class OperationUnit {
 				//交给CDB
 				st.isExcuting = false;
 				st.busy = false;
+				//System.out.println(stations[0]);
+				//System.out.println(st);
+//				assert st == stations[0];
 				if(st.op == OP.LD) {
 					//lo++;
-					lo = (lo + 1) % stations.length;
+					//lo = (lo + 1) % stations.length;
+					removeHead();
 				}
 			}
 			else {
 				//是store指令，应在写回阶段写mem
 				if(st.qk == null) {
+					assert st == stations[0];
 					FloatPointUnit.memory[st.a] = st.vk;
 					st.isExcuting = false;
 					st.busy = false;
-					st = null;
+					//st = null;
 					//lo++;
-					lo = (lo + 1) % stations.length;
+					//lo = (lo + 1) % stations.length;
+					removeHead();
+				} else {
+					assert false;
 				}
 			}
 		}
 		
 	}
-	
+
 	public boolean issueInstruction(Instruction curr) {
 		if(operation == UnitType.ADD || operation == UnitType.MULT) {
 			for(ReserStation station: stations) {
@@ -243,9 +268,10 @@ public class OperationUnit {
 				//已经满了
 				return false;
 			}
-			ReserStation station = stations[hi];
+			ReserStation station = stations[max_used];
 			station.issueIn(curr);
-			hi = (hi + 1) % stations.length;
+			max_used++;
+			//hi = (hi + 1) % stations.length;
 			return true;
 		}
 		return false;
@@ -309,3 +335,4 @@ public class OperationUnit {
 	}
 	
 }
+

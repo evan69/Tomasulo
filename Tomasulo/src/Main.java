@@ -68,6 +68,8 @@ public class Main extends JFrame implements ActionListener {
 	private JTextField memaddr, command_numbers; 
 	private JFileChooser fileChooser;
 	private JLabel cmdl;
+	private int Tn, mempos;
+	private ArrayList<Instruction> allinst;
 	
 	//-----------------------------------------运行状态------------------------------------------	
 	private JPanel panel_cdt, cdtp;
@@ -523,6 +525,8 @@ public class Main extends JFrame implements ActionListener {
 		//-----------------------------------------运行状态------------------------------------------	
 		System.out.println("enter preparest");
 		int cmdnn = cmdn + 1;
+		Instruction tmpi = null;
+		allinst = new ArrayList<Instruction>();
 		for (int i = 1; i < cmdnn; i++)
 			for (int j = 0; j < 4; j++) {
 				if (j == 0) {
@@ -539,7 +543,9 @@ public class Main extends JFrame implements ActionListener {
 								+ ",  "
 								+ ix[instbox[temp + 2].getSelectedIndex()]
 								;
-						fpu.addInstruction(new Instruction(op(instbox[temp].getSelectedIndex()), fx[instbox[temp + 1].getSelectedIndex()], Integer.valueOf(ix[instbox[temp + 2].getSelectedIndex()])));
+						tmpi = new Instruction(op(instbox[temp].getSelectedIndex()), fx[instbox[temp + 1].getSelectedIndex()], Integer.valueOf(ix[instbox[temp + 2].getSelectedIndex()]));
+						fpu.addInstruction(tmpi);
+						allinst.add(tmpi);
 					} else {
 						disp = disp
 								+ fx[instbox[temp + 1].getSelectedIndex()]
@@ -547,8 +553,11 @@ public class Main extends JFrame implements ActionListener {
 								+ fx[instbox[temp + 2].getSelectedIndex()]
 								+ ",  "
 								+ fx[instbox[temp + 3].getSelectedIndex()];
-						fpu.addInstruction(new Instruction(op(instbox[temp].getSelectedIndex()), fx[instbox[temp + 1].getSelectedIndex()], fx[instbox[temp + 2].getSelectedIndex()], fx[instbox[temp + 3].getSelectedIndex()]));
+						tmpi = new Instruction(op(instbox[temp].getSelectedIndex()), fx[instbox[temp + 1].getSelectedIndex()], fx[instbox[temp + 2].getSelectedIndex()], fx[instbox[temp + 3].getSelectedIndex()]);
+						fpu.addInstruction(tmpi);
+						allinst.add(tmpi);
 					}
+					
 					inst_cdtst[i][j] = disp;
 				}// if(j==0)
 				else
@@ -701,12 +710,7 @@ public class Main extends JFrame implements ActionListener {
 	private void actionMemSave(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() == savebut){
-			int pos = Integer.valueOf( memaddr.getText());
-			if (pos<0 || pos>4091){
-				pos=0;
-				memaddr.setText(Integer.toString(pos));
-				return;
-			}
+			int pos = mempos;
 			for (int i = 1; i<6; i++){				
 				
 				inst_memst[0][i] = Integer.toString(pos + i - 1);
@@ -723,16 +727,16 @@ public class Main extends JFrame implements ActionListener {
 	private void actionLookup(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() == lookupbut){
-			int pos = Integer.valueOf( memaddr.getText());
-			if (pos<0 || pos>4091)
-				pos=0;
-			memaddr.setText(Integer.toString(pos));
+			mempos = Integer.valueOf( memaddr.getText());
+			if (mempos<0 || mempos>4091)
+				mempos=0;
+			memaddr.setText(Integer.toString(mempos));
 			
 			for (int i = 1; i<6; i++){
 //				inst_meml[0][i].setText(Integer.toString(pos + i - 1));
 //				inst_memt[1][i].setText(Float.toString(fpu.memory[pos + i - 1]));				
-				inst_memst[0][i]=Integer.toString(pos + i - 1);
-				inst_memst[1][i]=Float.toString(fpu.memory[pos + i - 1]);				
+				inst_memst[0][i]=Integer.toString(mempos + i - 1);
+				inst_memst[1][i]=Float.toString(fpu.memory[mempos + i - 1]);				
 				
 			}
 			display();
@@ -808,7 +812,7 @@ public class Main extends JFrame implements ActionListener {
 		if (e.getSource() == startbut) {
 			for (int i = 0; i < cmdnn; i++)
 				instbox[i].setEnabled(false);
-			
+			Tn = 0;
 			stepbut.setEnabled(true);
 			stepnbut.setEnabled(true);
 			startbut.setEnabled(false);
@@ -836,7 +840,7 @@ public class Main extends JFrame implements ActionListener {
 		if (e.getSource() == stepbut){
 			System.out.println("enter actstep");
 			fpu.update();
-			
+			Tn++;
 			String[] res = fpu.showReserStations().split("\n");
 	
 			int r = 1;
@@ -886,7 +890,32 @@ public class Main extends JFrame implements ActionListener {
 				inst_regst[2][i] = row[1];
 				
 			}
-		display();
+			
+			for (int i = 0; i<5; i++)
+				inst_memst[1][1+i] = Float.toString(fpu.getMem(i+mempos));
+						
+			r=1;
+			for (int i = 0,j=allinst.size(); i<j;i++,r++){
+				int v = allinst.get(i).getInstStatus();
+				if (v == -1){
+					inst_cdtst[r][1] = "";
+					inst_cdtst[r][2] = "";
+					inst_cdtst[r][3] = "";
+				}
+				else if (v >= 0){
+					inst_cdtst[r][1] = "OK";
+					inst_cdtst[r][2] = Integer.toString(v);
+					inst_cdtst[r][3] = "";
+				}
+				else if (v == -1){
+					inst_cdtst[r][1] = "OK";
+					inst_cdtst[r][2] = "OK";
+					inst_cdtst[r][3] = "OK";
+				}
+			}
+			
+			
+			display();
 		}
 	}
 }

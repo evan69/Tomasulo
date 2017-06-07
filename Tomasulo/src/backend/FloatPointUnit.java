@@ -29,7 +29,7 @@ public class FloatPointUnit {
 		System.out.println(addUnit);
 		System.out.println(multUnit);
 		System.out.println(memUnit);
-		System.out.println("\n\n\n");
+//		System.out.println("\n\n\n");
 	}
 	
 	public String showReserStations() {
@@ -53,7 +53,36 @@ public class FloatPointUnit {
 	public String getRegInfo() {
 		return regs.toString();
 	}
+
+	public void setMem(int ind, float v) {
+		memory[ind] = v;
+	}
+
+	public float getMem(int ind) {
+		return memory[ind];
+	}
 	
+	public void reset() {
+		RegStates.getInstance().reset();
+		memory = new float[4096];
+		addUnit = new OperationUnit(3, UnitType.ADD);
+		multUnit = new OperationUnit(2, UnitType.MULT);
+		memUnit = new OperationUnit(6, UnitType.MEM);
+		instQueue = new LinkedList<Instruction>();
+	}
+
+	public boolean finishExcute() {
+		if(!instQueue.isEmpty())
+			return false;
+		if(!addUnit.finishExcute())
+			return false;
+		if(!multUnit.finishExcute())
+			return false;
+		if(!memUnit.finishExcute())
+			return false;
+		return true;
+	}
+
 	public void addInstruction(Instruction instruction) {
 		instQueue.add(instruction);
 	}
@@ -112,4 +141,3 @@ public class FloatPointUnit {
 		memUnit.writeBack();
 	}
 }
-

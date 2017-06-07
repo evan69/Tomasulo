@@ -24,7 +24,7 @@ public class Main {
 		new Instruction(OP.DIVD, "F5", "F1", "F2"),
 		new Instruction(OP.ADDD, "F5", "F3", "F2")
 		*/
-
+		/*
 		new Instruction(OP.MULD, "F0", "F1", "F2"),
 		new Instruction(OP.MULD, "F0", "F1", "F2"),
 		new Instruction(OP.MULD, "F0", "F1", "F2"),
@@ -37,6 +37,21 @@ public class Main {
 		new Instruction(OP.MULD, "F0", "F1", "F2"),
 		new Instruction(OP.MULD, "F0", "F1", "F2"),
 		new Instruction(OP.DIVD, "F0", "F1", "F2")
+		*/
+		/*
+		new Instruction(OP.ST  , "F0", 0),
+		new Instruction(OP.LD  , "F1", 0),
+		new Instruction(OP.ST  , "F0", 0),
+		new Instruction(OP.LD  , "F2", 0),
+		new Instruction(OP.ST  , "F0", 0),
+		new Instruction(OP.LD  , "F3", 0),
+		new Instruction(OP.ST  , "F0", 0),
+		new Instruction(OP.LD  , "F4", 0)
+		*/
+		new Instruction(OP.ADDD, "F0", "F1", "F2"),
+		new Instruction(OP.ST  , "F0", 0),
+		new Instruction(OP.SUBD, "F1", "F2", "F3"),
+		new Instruction(OP.LD  , "F1", 0)
 	};
 	public static void main(String[] args) {
 		System.out.println("test");
@@ -49,7 +64,24 @@ public class Main {
 		for(int i = 0; i < testInstr.length; ++i) {
 			cpu.addInstruction(testInstr[i]);
 		}
-		for(int i = 0; i < 120 ; i++) {
+		for(int i = 0; !cpu.finishExcute() ; i++) {
+		//while(!cpu.finishExcute())
+			System.out.println("update " + i);
+			cpu.update();
+			for(Instruction ins: testInstr) {
+				System.out.println(ins.toString() + ins.getInstStatus());
+			}
+			System.out.println("\n\n\n");
+		}
+		System.out.println(RegStates.getInstance().toString());
+		cpu.reset();
+		for(int i = 0; i < regs.length; ++i) {
+			cpu.setReg(i, regs[i]);
+		}
+		for(int i = 0; i < testInstr.length; ++i) {
+			cpu.addInstruction(testInstr[i]);
+		}
+		for(int i = 0; !cpu.finishExcute() ; i++) {
 			System.out.println("update " + i);
 			cpu.update();
 		}
