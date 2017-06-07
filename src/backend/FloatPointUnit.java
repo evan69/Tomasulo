@@ -61,6 +61,15 @@ public class FloatPointUnit {
 		return memory[ind];
 	}
 	
+	public void reset() {
+		RegStates.getInstance().reset();
+		memory = new float[4096];
+		addUnit = new OperationUnit(3, UnitType.ADD);
+		multUnit = new OperationUnit(2, UnitType.MULT);
+		memUnit = new OperationUnit(6, UnitType.MEM);
+		instQueue = new LinkedList<Instruction>();
+	}
+
 	public boolean finishExcute() {
 		if(!instQueue.isEmpty())
 			return false;

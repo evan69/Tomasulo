@@ -51,5 +51,12 @@ public class RegStates {
 	public void setReg(int ind, float result) {
 		regValues[ind] = result;
 	}
+
+	public void reset() {
+		for(int i = 0;i < REG_NUM;i++) {
+			regValues[i] = 0;
+			sourceStations[i] = null;
+		}
+	}
 	
 }
