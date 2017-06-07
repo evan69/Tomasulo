@@ -43,6 +43,14 @@ public class OperationUnit {
 		}
 	}
 	
+	public boolean finishExcute() {
+		for(ReserStation st : stations) {
+			if(st.busy)
+				return false;
+		}
+		return true;
+	}
+	
 	//执行阶段被调用，获取计算结果（除store返回0不代表计算结果）
 	private float getResult(ReserStation st) {
 		switch (st.op)

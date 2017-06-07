@@ -64,7 +64,8 @@ public class Main {
 		for(int i = 0; i < testInstr.length; ++i) {
 			cpu.addInstruction(testInstr[i]);
 		}
-		for(int i = 0; i < 120 ; i++) {
+		for(int i = 0; !cpu.finishExcute() ; i++) {
+		//while(!cpu.finishExcute())
 			System.out.println("update " + i);
 			cpu.update();
 		}

@@ -52,7 +52,27 @@ public class FloatPointUnit {
 	public String getRegInfo() {
 		return regs.toString();
 	}
+
+	public void setMem(int ind, float v) {
+		memory[ind] = v;
+	}
+
+	public float getMem(int ind) {
+		return memory[ind];
+	}
 	
+	public boolean finishExcute() {
+		if(!instQueue.isEmpty())
+			return false;
+		if(!addUnit.finishExcute())
+			return false;
+		if(!multUnit.finishExcute())
+			return false;
+		if(!memUnit.finishExcute())
+			return false;
+		return true;
+	}
+
 	public void addInstruction(Instruction instruction) {
 		instQueue.add(instruction);
 	}
