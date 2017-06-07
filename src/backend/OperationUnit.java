@@ -147,8 +147,44 @@ public class OperationUnit {
 	
 	//执行
 	public void execute() {
-		for(ReserStation st : stations) {
-			if(st.isBusy() && st.isExcuting) {
+		ReserStation[] tmp = null;
+		if(isExcutingDivide()) {
+			tmp = new ReserStation[1];
+			for(ReserStation st : stations) {
+				if(st.isBusy()) {
+					tmp[0] = st;
+					break;
+				}
+			}
+			assert false;
+		} else {
+			switch (operation) {
+			case ADD:
+				tmp = new ReserStation[ADD_STAGES.length];
+				break;
+			case MULT:
+				tmp = new ReserStation[MULT_STAGES.length];
+				break;
+			case MEM:
+				tmp = new ReserStation[MEM_STAGES.length];
+				break;
+			default:
+				tmp = new ReserStation[0];
+			}
+			for(int i = tmp.length - 1; i >= 0; i--) {
+				for(ReserStation st : stations) {
+					if(st.isBusy() && st.stage == i) {
+						tmp[i] = st;
+						break;
+					}
+				}
+			}
+		}
+		for(ReserStation caonima : tmp) {
+			System.out.println("nimabi" + caonima);
+		}
+		for(ReserStation st : tmp) {
+			if(st != null && st.isBusy() && st.isExcuting) {
 				//正在执行
 				if(st.currentTime > 0) {
 					--st.currentTime;
