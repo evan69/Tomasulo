@@ -12,7 +12,7 @@ public class FloatPointUnit {
 		ADD, MULT, MEM
 	};
 	//4个保留站，每个可能被多种运算共享
-	static float memory[] = new float[4096];
+	public static float memory[] = new float[4096];
 	OperationUnit addUnit = new OperationUnit(3, UnitType.ADD);
 	OperationUnit multUnit = new OperationUnit(2, UnitType.MULT);
 	OperationUnit memUnit = new OperationUnit(6, UnitType.MEM);
