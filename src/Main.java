@@ -835,9 +835,8 @@ public class Main extends JFrame implements ActionListener {
 	private void actionReset(ActionEvent e) {
 		
 		if (e.getSource() ==resetbut) {
-			reset_cmd();
 			fpu.reset();
-			display();
+			reset_cmd();
 		}
 	}
 
@@ -926,6 +925,15 @@ public class Main extends JFrame implements ActionListener {
 		}
 		
 	
+		for (int i = 1; i<7; i++){
+			inst_storest[i][1] = "no";
+			inst_storest[i][2] = "";
+			inst_storest[i][3] = "";
+			inst_loadst[i][1] = "no";
+			inst_loadst[i][2] = "";
+			inst_loadst[i][3] = "";
+		}
+		
 		int rl = 1, rs = 1;
 		for (int i = 6; i<13; i++){
 			String[] row = res[i].split("\t");
