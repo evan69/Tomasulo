@@ -1,40 +1,34 @@
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 import backend.*;
 import backend.FloatPointUnit.OP;
 
 public class Main extends JFrame implements ActionListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//-----------------------------------------指令队列------------------------------------------	
 	/*	
 	 * 指令队列面板
@@ -314,7 +308,6 @@ public class Main extends JFrame implements ActionListener {
 		FlowLayout all_layout = new FlowLayout(FlowLayout.LEFT);
 		getContentPane().setLayout(all_layout);
 
-		int label_w = 100;
 		int but_w = 1400, but_h = 50;
 		
 		//-----------------------------------------功能按钮------------------------------------------	
@@ -371,7 +364,6 @@ public class Main extends JFrame implements ActionListener {
 	
 	
 	private void backend() {
-		// TODO Auto-generated method stub
 		fpu = new FloatPointUnit();
 		for(int i = 0; i < 11; ++i) {
 			fpu.setReg(i, 0);
@@ -381,7 +373,6 @@ public class Main extends JFrame implements ActionListener {
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		new Main();
 	}
 
@@ -390,7 +381,6 @@ public class Main extends JFrame implements ActionListener {
 
 
 	private void window_clear() {
-		// TODO Auto-generated method stub
 		cdtp.setVisible(false);
 		instp.setVisible(false);
 		loadp.setVisible(false);
@@ -409,7 +399,6 @@ public class Main extends JFrame implements ActionListener {
 		getContentPane().validate();
 	}
 	private void display() {
-		// TODO Auto-generated method stub
 		int cmdnn = cmdn + 1;
 		for (int i = 0; i < cmdnn; i++)
 			for (int j = 0; j < 4; j++) {
@@ -518,10 +507,17 @@ public class Main extends JFrame implements ActionListener {
 		
 		inst_memst[0][0] = "地址";
 		inst_memst[1][0] = "值";
+		
+		memaddr.setText("0");
+		mempos = 0;
+		for (int i = 0; i<5; i++){
+			inst_memst[0][i+1] = Integer.toString(i);
+			inst_memst[1][i+1] = Float.toString(fpu.memory[i]);
+		}
 	}
 
 	private void preparest() {
-		// TODO Auto-generated method stub
+	
 		//-----------------------------------------运行状态------------------------------------------	
 		System.out.println("enter preparest");
 		int cmdnn = cmdn + 1;
@@ -568,7 +564,7 @@ public class Main extends JFrame implements ActionListener {
 	}
 
 	private OP op(int op) {
-		// TODO Auto-generated method stub
+
 		System.out.println("enter OP fun" + inst[op]);
 		if (op == 1)
 			return OP.ST;
@@ -592,7 +588,7 @@ public class Main extends JFrame implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+
 		//-----------------------------------------指令队列------------------------------------------	
 		actionInstbox(e);
 		
@@ -622,7 +618,7 @@ public class Main extends JFrame implements ActionListener {
 
 
 	private void actionFile(ActionEvent e) {
-		// TODO Auto-generated method stub
+	
 		if (e.getSource() == filebut){
 			fileChooser = new JFileChooser();
 			int selected = fileChooser.showOpenDialog(getContentPane());
@@ -644,6 +640,10 @@ public class Main extends JFrame implements ActionListener {
 						for (int j = 0; j < 4; j++)
 							instbox[p+j].removeAllItems();
 						String[] line = rows.get(i).split(" ");
+						if (line.length != 3 && line.length != 4){
+							JOptionPane.showMessageDialog(this, "文件格式错误", "文件格式错误", JOptionPane.PLAIN_MESSAGE);
+							return;
+						}
 						for (int j = 0; j<line.length; j++){
 							boolean flag = false;
 							for (int k = 0; k<inst.length;k++)
@@ -681,12 +681,16 @@ public class Main extends JFrame implements ActionListener {
 								}
 						}
 					}
+					reader.close();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
+			
 					e1.printStackTrace();
 				}
 				
 			}
+			if (cmdn < 10)
+				cmdn = 10;
+
 		}
 	}
 
@@ -694,11 +698,17 @@ public class Main extends JFrame implements ActionListener {
 
 
 	private void actionRegsave(ActionEvent e) {
-		// TODO Auto-generated method stub
+
 		if (e.getSource() == regsavebut){
 			for (int i = 0; i<11; i++){
 				inst_regst[2][i+1] = inst_regt[2][i+1].getText();
-				float v = Float.valueOf(inst_regt[2][i+1].getText());
+				float v = 0;
+				try {
+					v = Float.valueOf(inst_regt[2][i+1].getText());
+					
+				} catch (Exception e2) {
+					JOptionPane.showMessageDialog(this, "输入不是数字", "输入不是数字", JOptionPane.PLAIN_MESSAGE);
+				}
 				
 				fpu.setReg(i, v);
 			}
@@ -710,14 +720,22 @@ public class Main extends JFrame implements ActionListener {
 
 
 	private void actionMemSave(ActionEvent e) {
-		// TODO Auto-generated method stub
+	
 		if (e.getSource() == savebut){
 			int pos = mempos;
 			for (int i = 1; i<6; i++){				
 				
 				inst_memst[0][i] = Integer.toString(pos + i - 1);
 				inst_memst[1][i] = inst_memt[1][i].getText();
-				fpu.memory[pos + i - 1] = Float.valueOf(inst_memt[1][i].getText());				
+				try {
+					fpu.memory[pos + i - 1] = Float.valueOf(inst_memt[1][i].getText());				
+					
+				} catch (Exception e2) {
+					
+					fpu.memory[pos + i - 1] = 0.0f;		
+					JOptionPane.showMessageDialog(this, "输入不是数字", "输入不是数字", JOptionPane.PLAIN_MESSAGE);
+
+				}
 			}
 			display();
 		}
@@ -727,9 +745,15 @@ public class Main extends JFrame implements ActionListener {
 
 
 	private void actionLookup(ActionEvent e) {
-		// TODO Auto-generated method stub
+		
 		if (e.getSource() == lookupbut){
-			mempos = Integer.valueOf( memaddr.getText());
+			try {
+				mempos = Integer.valueOf( memaddr.getText());
+				
+			} catch (Exception e2) {
+				mempos = 0;
+				JOptionPane.showMessageDialog(this, "输入不是数字", "输入不是数字", JOptionPane.PLAIN_MESSAGE);
+			}
 			if (mempos<0 || mempos>4091)
 				mempos=0;
 			memaddr.setText(Integer.toString(mempos));
@@ -785,7 +809,14 @@ public class Main extends JFrame implements ActionListener {
 	}
 	
 	void reset_cmd(){
-		cmdn = Integer.valueOf(command_numbers.getText());
+		try {
+			cmdn = Integer.valueOf(command_numbers.getText());
+			
+		} catch (Exception e) {
+			cmdn = 10;
+			JOptionPane.showMessageDialog(this, "输入不是数字", "输入不是数字", JOptionPane.PLAIN_MESSAGE);
+
+		}
 		startbut.setEnabled(true);
 		startbut.setEnabled(true);
 		savebut.setEnabled(true);
@@ -799,10 +830,11 @@ public class Main extends JFrame implements ActionListener {
 	}
 
 	private void actionReset(ActionEvent e) {
-		// TODO Auto-generated method stub
+		
 		if (e.getSource() ==resetbut) {
 			reset_cmd();
 			fpu.reset();
+			display();
 		}
 	}
 
@@ -810,12 +842,12 @@ public class Main extends JFrame implements ActionListener {
 
 
 	private void actionStart(ActionEvent e) {
-		// TODO Auto-generated method stub
+		
 		int cmdnn = cmdn * 4;
 		if (e.getSource() == startbut) {
 			for (int i = 0; i < cmdnn; i++)
 				instbox[i].setEnabled(false);
-			Tn = 0;
+			setTn(0);
 			stepbut.setEnabled(true);
 			stepnbut.setEnabled(true);
 			startbut.setEnabled(false);
@@ -842,16 +874,17 @@ public class Main extends JFrame implements ActionListener {
 				public void run() {
 					while (! fpu.finishExcute()){
 						fpu.update();
-						Tn++;
+						setTn(getTn() + 1);
 						update();
 						display();
 						try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
+						
 							e1.printStackTrace();
 						}		
 					}
+					JOptionPane.showMessageDialog(null, "执行完成", "执行完成", JOptionPane.PLAIN_MESSAGE);
 				}
 			});
 			thread.start();
@@ -863,7 +896,7 @@ public class Main extends JFrame implements ActionListener {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
+				
 					e1.printStackTrace();
 				}		
 			}*/
@@ -947,14 +980,30 @@ public class Main extends JFrame implements ActionListener {
 	}
 
 	private void actionStep(ActionEvent e) {
-		// TODO Auto-generated method stub
+	
 		if (e.getSource() == stepbut){
 			System.out.println("enter actstep");
 			fpu.update();
-			Tn++;
+			setTn(getTn() + 1);
 			
 			update();
 			display();
+			if (fpu.finishExcute())
+				 JOptionPane.showMessageDialog(this, "执行完成", "执行完成", JOptionPane.PLAIN_MESSAGE);
 		}
+	}
+
+
+
+
+	public int getTn() {
+		return Tn;
+	}
+
+
+
+
+	public void setTn(int tn) {
+		Tn = tn;
 	}
 }
