@@ -633,10 +633,12 @@ public class Main extends JFrame implements ActionListener {
 						rows.add(row);
 					}
 					cmdn = rows.size();
+					if (cmdn < 10)
+						cmdn = 10;
 					command_numbers.setText(Integer.toString(cmdn));
 					reset_cmd();
 					int p = 0;
-					for (int i = 0; i<cmdn; i++, p+=4){
+					for (int i = 0; i<rows.size(); i++, p+=4){
 						for (int j = 0; j < 4; j++)
 							instbox[p+j].removeAllItems();
 						String[] line = rows.get(i).split(" ");
@@ -688,8 +690,7 @@ public class Main extends JFrame implements ActionListener {
 				}
 				
 			}
-			if (cmdn < 10)
-				cmdn = 10;
+
 
 		}
 	}
@@ -811,7 +812,9 @@ public class Main extends JFrame implements ActionListener {
 	void reset_cmd(){
 		try {
 			cmdn = Integer.valueOf(command_numbers.getText());
-			
+			if (cmdn < 10)
+				cmdn = 10;
+			command_numbers.setText(Integer.toString(cmdn));
 		} catch (Exception e) {
 			cmdn = 10;
 			JOptionPane.showMessageDialog(this, "输入不是数字", "输入不是数字", JOptionPane.PLAIN_MESSAGE);
